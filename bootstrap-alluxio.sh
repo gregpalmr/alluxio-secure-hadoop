@@ -48,6 +48,11 @@ if [ "$ALLUXIO_TARBALL" != "" ]; then
         fi
 fi
 
+# Copy Alluxio license files
+if [ -f /tmp/config_files/alluxio/alluxio-enterprise-license.json ]; then
+        cp /tmp/config_files/alluxio/alluxio-enterprise-license.json $ALLUXIO_HOME/license.json
+fi
+
 # Create an alluxio user, for testing purposes
 useradd alluxio-user1
 sleep 2
@@ -70,15 +75,6 @@ kinit -kt ${KEYTAB_DIR}/alluxio.service.keytab alluxio/$(hostname -f)@${KRB_REAL
 
 # Configure the alluxio-site.properties file
 cp /tmp/config_files/alluxio/alluxio-site.properties $ALLUXIO_HOME/conf/alluxio-site.properties
-cat <<EOT >> $ALLUXIO_HOME/conf/alluxio-site.properties
-
-# Setup client-side (northbound) Kerberos authentication
-alluxio.security.authentication.type=KERBEROS
-alluxio.security.authorization.permission.enabled=true
-alluxio.security.kerberos.server.principal=alluxio/FQDN@EXAMPLE.COM
-alluxio.security.kerberos.server.keytab.file=/etc/security/keytabs/alluxio.service.keytab
-alluxio.security.kerberos.auth.to.local=RULE:[1:$1@$0](alluxio.*@.*EXAMPLE.COM)s/.*/alluxio/ RULE:[1:$1@$0](A.*@EXAMPLE.COM)s/A([0-9]*)@.*/a$1/ DEFAULT
-EOT
 
 sed -i "s/NAMENODE/${NAMENODE}/g" $ALLUXIO_HOME/conf/alluxio-site.properties
 sed -i "s/FQDN/${FQDN}/g" $ALLUXIO_HOME/conf/alluxio-site.properties
