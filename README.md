@@ -147,4 +147,11 @@ The above command shows Alluxio access the kerberized Hadoop environment that ha
 
 ---
 
+KNOWN ISSUES:
+
+- In the bootstrap-alluxio.sh script, the kadmin command to create the principal for the alluxio-user1 user, is erroring out with the message:
+
+     kadmin: unable to get default realm
+---
+
 Please direct questions and comments to greg.palmer@alluxio.com
