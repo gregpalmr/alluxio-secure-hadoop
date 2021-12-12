@@ -1,0 +1,128 @@
+version: '2'
+
+networks:
+  custom:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.22.0.0/16
+        gateway: 172.22.0.1
+
+services:
+  kdc:
+    networks:
+      custom:
+        ipv4_address: 172.22.0.2
+    image: sequenceiq/kerberos
+    hostname: kdc.kerberos.com
+    container_name: kdc
+    environment:
+      REALM: EXAMPLE.COM
+      DOMAIN_REALM: kdc.kerberos.com
+    volumes:
+      - "./config_files/kdc/krb5.conf:/etc/krb5.conf"
+      - "/dev/urandom:/dev/random"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "keytabs:/etc/security/keytabs"
+
+  hadoop:
+    networks:
+      custom:
+        ipv4_address: 172.22.0.3
+    image: myalluxio/alluxio-secure-hadoop:2.7.4
+    depends_on: 
+      - kdc
+    hostname: hadoop
+    domainname: docker.com
+    container_name: hadoop
+    tty: true
+    extra_hosts:
+      - "kdc.kerberos.com kdc:172.22.0.2"
+    environment:
+      KRB_REALM: EXAMPLE.COM
+      DOMAIN_REALM: kdc.kerberos.com
+      FQDN: hadoop.docker.com
+      HADOOP_FQDN: hadoop.docker.com
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "./config_files/kdc/krb5.conf:/etc/krb5.conf"
+      - "./bootstrap-hadoop.sh:/bootstrap.sh"
+      - "keytabs:/etc/security/keytabs"
+    expose:
+     - 50010
+     - 50020
+     - 50070
+     - 50075
+     - 50090
+     - 8020
+     - 9000
+     - 10020
+     - 19888
+     - 8030
+     - 8031
+     - 8032
+     - 8033
+     - 8040
+     - 8042
+     - 8088
+    ports:
+     - 50010:50010
+     - 50020:50020
+     - 50070:50070
+     - 50075:50075
+     - 50090:50090
+     - 8020:8020
+     - 9000:9000
+     - 10020:10020
+     - 19888:19888
+     - 8030:8030
+     - 8031:8031
+     - 8032:8032
+     - 8033:8033
+     - 8040:8040
+     - 8042:8042
+     - 8088:8088
+    command: ["/bootstrap.sh"]
+
+  alluxio:
+    networks:
+      custom:
+        ipv4_address: 172.22.0.4
+    image: myalluxio/alluxio-secure-hadoop:2.7.4
+    shm_size: '1gb'
+    depends_on:
+      - kdc
+    hostname: alluxio
+    domainname: docker.com
+    container_name: alluxio
+    tty: true
+    extra_hosts:
+      - "kdc.kerberos.com kdc:172.22.0.2"
+      - "hadoop.docker.com hadoop:172.22.0.3"
+    environment:
+      KRB_REALM: EXAMPLE.COM
+      DOMAIN_REALM: kdc.kerberos.com
+      FQDN: alluxio.docker.com
+      HADOOP_FQDN: hadoop.docker.com
+      NAMENODE: hadoop.docker.com:9000
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "./config_files:/tmp/config_files"
+      - "./bootstrap-alluxio.sh:/bootstrap.sh"
+      - "keytabs:/etc/security/keytabs"
+    expose:
+      - "19998"
+      - "19999"
+      - "29998"
+      - "29999"
+    ports:
+      - "19998:19998"
+      - "19999:19999"
+      - "29998:29998"
+      - "29999:29999"
+    command: ["/bootstrap.sh"]
+
+volumes:
+  keytabs:
+    driver: local
