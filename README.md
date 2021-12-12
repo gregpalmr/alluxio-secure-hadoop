@@ -109,10 +109,6 @@ Open a command shell into the Alluxio container.
 
      docker exec -it alluxio bash
 
-Become the test alluxio user.
-
-     su - alluxio-user1
-
 Destroy any kerberos ticket that may be active
 
      kdestroy
