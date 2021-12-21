@@ -106,6 +106,8 @@ If you are done testing and do not intend to spin up the docker images again, re
 
      docker volume rm alluxio-secure-hadoop_keytabs  
 
+     docker volume rm alluxio-secure-hadoop_mysql_data
+
 
 #### Step 7. Test Alluxio access to the secure Hadoop environment 
 
