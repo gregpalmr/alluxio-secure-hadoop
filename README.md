@@ -74,7 +74,11 @@ c. Add an environment variable identifying the tarball file name. For example:
 
 Build the docker image used for the Hadoop instances and the Alluxio instance.
 
-     docker build -t myalluxio/alluxio-secure-hadoop:2.7.4 .
+     docker build -t myalluxio/alluxio-secure-hadoop:hadoop-2.7.4 . 2>&1 | tee  ./build-log.txt
+
+Note: if you run out of Docker volume space, run this command:
+
+     docker volume prune
 
 ### Step 6. Start the kdc, hadoop and alluxio containers
 
@@ -105,17 +109,23 @@ If you are done testing and do not intend to spin up the docker images again, re
 
 #### Step 7. Test Alluxio access to the secure Hadoop environment 
 
-Open a command shell into the Alluxio container.
+Open a command shell into the Alluxio container and execute the /etc/profile script.
 
      docker exec -it alluxio bash
 
-Destroy any kerberos ticket that may be active
+     source /etc/profile
 
-     kdestroy
+Create a Kerberos principal for the test Alluxio user:
+
+     kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -pw ${NON_ROOT_PASSWORD} alluxio-user1@${KRB_REALM}"
+
+Become the test Alluxio user:
+
+     su - alluxio-user1
 
 Attempt to read the Alluxio virtual filesystem.
 
-     alluxio fs ls /tmp
+     alluxio fs ls /user/
 
      < you will see a permission denied error >
 
@@ -123,7 +133,7 @@ Acquire a Kerberos ticket.
 
      kinit
 
-     < enter the user's kerberos password: it defaults to "password" >
+     < enter the user's kerberos password: it defaults to "changeme123" >
 
 Show the valid Kerberos ticket:
 
@@ -131,15 +141,37 @@ Show the valid Kerberos ticket:
 
 Attempt to read the Alluxio virtual filesystem.
 
-     alluxio fs ls /tmp
+     alluxio fs ls /user/
 
-     < you will see the contents of the /tmp HDFS directory >
+     < you will see the contents of the /user HDFS directory >
 
 The above command shows Alluxio access the kerberized Hadoop environment that had the following HDFS properties configured:
 
       dfs.encrypt.data.transfer           = true
       dfs.encrypt.data.transfer.algorithm = 3des
       dfs.http.policy set                 = HTTPS_ONLY
+
+Create a directory for the Alluxio user:
+
+     alluxio fs mkdir /user/alluxio-user1
+
+Copy a file to the new directory:
+
+     alluxio fs copyFromLocal /etc/motd /user/alluxio-user1/
+
+List the files in the new directory (notice that the motd file is not persisted yet):
+
+     alluxio fs ls /user/alluxio-user1/
+
+Cause the file to be persisted (written to the under filesystem or HDFS):
+
+     alluxio fs persist /user/alluxio-user1/
+
+See that the file has been persisted using the Alluxio command and the HDFS commands:
+
+     alluxio fs ls /user/alluxio-user1/
+
+     hdfs dfs -ls /user/alluxio-user1/
 
 ---
 
@@ -148,6 +180,7 @@ KNOWN ISSUES:
 - In the bootstrap-alluxio.sh script, the kadmin command to create the principal for the alluxio-user1 user, is erroring out with the message:
 
      kadmin: unable to get default realm
+
 ---
 
 Please direct questions and comments to greg.palmer@alluxio.com

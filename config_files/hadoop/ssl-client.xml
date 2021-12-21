@@ -20,7 +20,7 @@
 
 <property>
   <name>ssl.client.truststore.location</name>
-  <value>/usr/local/hadoop/lib/keystore.jks</value>
+  <value>/opt/hadoop/lib/keystore.jks</value>
   <description>Truststore to be used by clients like distcp. Must be
   specified.
   </description>
@@ -50,7 +50,7 @@
 
 <property>
   <name>ssl.client.keystore.location</name>
-  <value>/usr/local/hadoop/lib/keystore.jks</value>
+  <value>/opt/hadoop/lib/keystore.jks</value>
   <description>Keystore to be used by clients like distcp. Must be
   specified.
   </description>

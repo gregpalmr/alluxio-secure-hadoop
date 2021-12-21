@@ -23,8 +23,7 @@
 
 # The java implementation to use.
 export JAVA_HOME=/usr/java/default
-export HADOOP_HOME=/usr/local/hadoop
-
+export HADOOP_HOME=/opt/hadoop
 
 # The jsvc implementation to use. Jsvc is required to run secure datanodes
 # that bind to privileged ports to provide authentication of data transfer

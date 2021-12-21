@@ -6,7 +6,7 @@
 
     <property>
       <name>yarn.application.classpath</name>
-      <value>/usr/local/hadoop/etc/hadoop, /usr/local/hadoop/share/hadoop/common/*, /usr/local/hadoop/share/hadoop/common/lib/*, /usr/local/hadoop/share/hadoop/hdfs/*, /usr/local/hadoop/share/hadoop/hdfs/lib/*, /usr/local/hadoop/share/hadoop/mapreduce/*, /usr/local/hadoop/share/hadoop/mapreduce/lib/*, /usr/local/hadoop/share/hadoop/yarn/*, /usr/local/hadoop/share/hadoop/yarn/lib/*</value>
+      <value>/opt/hadoop/etc/hadoop, /opt/hadoop/share/hadoop/common/*, /opt/hadoop/share/hadoop/common/lib/*, /opt/hadoop/share/hadoop/hdfs/*, /opt/hadoop/share/hadoop/hdfs/lib/*, /opt/hadoop/share/hadoop/mapreduce/*, /opt/hadoop/share/hadoop/mapreduce/lib/*, /opt/hadoop/share/hadoop/yarn/*, /opt/hadoop/share/hadoop/yarn/lib/*</value>
     </property>
 
     <property>
@@ -55,7 +55,7 @@
    
   <property>
        <name>yarn.nodemanager.linux-container-executor.path</name>
-       <value>/usr/local/hadoop/bin/container-executor</value>
+       <value>/opt/hadoop/bin/container-executor</value>
   </property>
    
   <property>

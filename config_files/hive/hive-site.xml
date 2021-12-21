@@ -1,0 +1,82 @@
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<configuration>
+
+<property>
+  <name>system:java.io.tmpdir</name>
+  <value>/tmp/hive/java</value>
+</property>
+<property>
+  <name>system:user.name</name>
+  <value>${user.name}</value>
+</property>
+
+<property>
+  <name>javax.jdo.option.ConnectionURL</name>
+  <value>jdbc:mysql://hadoop/hive_metastore?createDatabaseIfNotExist=true</value>
+</property>
+
+<property>
+  <name>javax.jdo.option.ConnectionDriverName</name>
+  <value>com.mysql.jdbc.Driver</value>
+</property>
+
+<property>
+  <name>javax.jdo.option.ConnectionUserName</name>
+  <value>hiveuser</value>
+</property>
+
+<property>
+  <name>javax.jdo.option.ConnectionPassword</name>
+  <value>changeme123</value>
+</property>
+
+<property>
+  <name>datanucleus.autoCreateSchema</name>
+  <value>false</value>
+</property>
+
+<property>
+  <name>hive.metastore.uris</name>
+  <value>thrift://hadoop:9083</value>
+  <description>IP address (or fully-qualified domain name) and port of the metastore host</description>
+</property>
+
+<property>
+  <name>hive.metastore.schema.verification</name>
+  <value>true</value>
+</property>
+
+<property>
+  <name>hive.server2.authentication</name>
+  <value>KERBEROS</value>
+</property>
+<property>
+  <name>hive.server2.authentication.kerberos.principal</name>
+  <value>hive/_HOST@EXAMPLE.COM</value>
+  <description>HiveServer2 principal. If _HOST is used as the FQDN portion, it will be replaced with the actual hostname of the running instance.</description>
+</property>
+<property>
+  <name>hive.server2.authentication.kerberos.keytab</name>
+  <value>/etc/security/keytabs/hive.service.keytab</value>
+</property>
+
+<property>
+  <name>hive.server2.thrift.port</name>
+  <value>10000</value>
+  <description>TCP port number to listen on, default 10000</description>
+</property>
+
+<property>
+  <name>hive.server2.enable.impersonation</name>
+  <description>Enable user impersonation for HiveServer2</description>
+  <value>true</value>
+</property>
+
+<property>
+    <!-- Needed for Presto to work with Hive -->
+    <name>metastore.storage.schema.reader.impl</name>
+    <value>org.apache.hadoop.hive.metastore.SerDeStorageSchemaReader</value>
+</property>
+
+</configuration>

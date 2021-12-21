@@ -8,12 +8,20 @@
 # ALLUXIO
 #
 
-# wait for the hadoop container's bootstrap script to procced
+# Wait for the hadoop container's bootstrap script to procced
 # because it sets the root kerberos user's password which is needed here
 sleep 10
 
-echo "export ALLUXIO_HOME=/opt/alluxio" >> /etc/profile
-echo "export PATH=\$PATH:\$ALLUXIO_HOME/bin" >> /etc/profile
+grep ALLUXIO_HOME /etc/profile
+if [ "$?" != 0 ]; then
+	echo "export ALLUXIO_HOME=/opt/alluxio" >> /etc/profile
+	echo "export PATH=\$PATH:\$ALLUXIO_HOME/bin" >> /etc/profile
+fi
+grep HADOOP_HOME /etc/profile
+if [ "$?" != 0 ];then
+        echo "export HADOOP_HOME=/opt/hadoop" >> /etc/profile
+        echo "export PATH=\$PATH:\$HADOOP_HOME/bin:\$HADOOP_HOME/sbin" >> /etc/profile
+fi
 . /etc/profile
 
 # If a new Alluxio install tarball was specified, install it
@@ -41,12 +49,21 @@ if [ "$ALLUXIO_TARBALL" != "" ]; then
                         #new_dir_name=$(echo $ALLUXIO_TARBALL | sed 's/-bin.tar.gz//')
                         new_dir_name=$(ls /opt | grep alluxio-enterprise | grep -v $orig_dir_name)
                         ln -s /opt/$new_dir_name /opt/alluxio
-
+			chown -R alluxio:root /opt/alluxio/
                         echo " ### CONTENTS of /opt/"
                 fi
                 cd $ORIG_PWD
         fi
 fi
+
+# Update the HDFS config files
+sed -i "s/HOSTNAME/${HADOOP_FQDN}/g" $HADOOP_HOME/etc/hadoop/core-site.xml
+sed -i "s/EXAMPLE.COM/${KRB_REALM}/g" $HADOOP_HOME/etc/hadoop/core-site.xml
+sed -i "s#/etc/security/keytabs#${KEYTAB_DIR}#g" $HADOOP_HOME/etc/hadoop/core-site.xml
+
+sed -i "s/EXAMPLE.COM/${KRB_REALM}/g" $HADOOP_HOME/etc/hadoop/hdfs-site.xml
+sed -i "s/HOSTNAME/${HADOOP_FQDN}/g" $HADOOP_HOME/etc/hadoop/hdfs-site.xml
+sed -i "s#/etc/security/keytabs#${KEYTAB_DIR}#g" $HADOOP_HOME/etc/hadoop/hdfs-site.xml
 
 # Copy Alluxio license files
 if [ -f /tmp/config_files/alluxio/alluxio-enterprise-license.json ]; then
@@ -56,9 +73,8 @@ fi
 # Create an alluxio user, for testing purposes
 useradd alluxio-user1
 sleep 2
-kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -pw ${KERBEROS_ROOT_USER_PASSWORD} alluxio-user1@${KRB_REALM}"
-sleep 2
-kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -pw ${KERBEROS_ROOT_USER_PASSWORD} alluxio-user1@${KRB_REALM}"
+echo "Running kadmin command: kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q \"addprinc -pw ${NON_ROOT_PASSWORD} alluxio-user1@${KRB_REALM}\""
+kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -pw ${NON_ROOT_PASSWORD} alluxio-user1@${KRB_REALM}"
 
 # Configure  kerberos client
 cp -f /tmp/config_files/kdc/krb5.conf /etc/krb5.conf
@@ -67,11 +83,10 @@ sed -i "s/example.com/${DOMAIN_REALM}/g" /etc/krb5.conf
 
 # Create kerberos principals
 kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -randkey alluxio/$(hostname -f)@${KRB_REALM}"
-kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k ${KEYTAB_DIR}/alluxio.service.keytab alluxio/$(hostname -f)@${KRB_REALM}"
-chmod 400 ${KEYTAB_DIR}/alluxio.service.keytab
-
-# Acquire Kerberos ticket
-kinit -kt ${KEYTAB_DIR}/alluxio.service.keytab alluxio/$(hostname -f)@${KRB_REALM}
+kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k alluxio.service.keytab alluxio/$(hostname -f)@${KRB_REALM}"
+chown alluxio:root alluxio.service.keytab
+chmod 400 alluxio.service.keytab
+mv alluxio.service.keytab ${KEYTAB_DIR}/
 
 # Configure the alluxio-site.properties file
 cp /tmp/config_files/alluxio/alluxio-site.properties $ALLUXIO_HOME/conf/alluxio-site.properties
@@ -80,21 +95,22 @@ sed -i "s/NAMENODE/${NAMENODE}/g" $ALLUXIO_HOME/conf/alluxio-site.properties
 sed -i "s/FQDN/${FQDN}/g" $ALLUXIO_HOME/conf/alluxio-site.properties
 sed -i "s/EXAMPLE.COM/${KRB_REALM}/g" $ALLUXIO_HOME/conf/alluxio-site.properties
 
+# Acquire Kerberos ticket for the alluxio user
+su - alluxio bash -c "kinit -kt ${KEYTAB_DIR}/alluxio.service.keytab alluxio/$(hostname -f)@${KRB_REALM}"
 
 # Format the master node journal
-$ALLUXIO_HOME/bin/alluxio formatJournal
+su - alluxio bash -c "$ALLUXIO_HOME/bin/alluxio formatJournal"
 
 # Start the master node daemons
-$ALLUXIO_HOME/bin/alluxio-start.sh master
-$ALLUXIO_HOME/bin/alluxio-start.sh job_master
-$ALLUXIO_HOME/bin/alluxio-start.sh proxy
+su - alluxio bash -c "$ALLUXIO_HOME/bin/alluxio-start.sh master"
+su - alluxio bash -c "$ALLUXIO_HOME/bin/alluxio-start.sh job_master"
+su - alluxio bash -c "$ALLUXIO_HOME/bin/alluxio-start.sh proxy"
 
 # Format the worker node ramdisk
 #$ALLUXIO_HOME/bin/alluxio formatWorker
 
-$ALLUXIO_HOME/bin/alluxio-start.sh worker 
-$ALLUXIO_HOME/bin/alluxio-start.sh job_worker
-
+su - alluxio bash -c "$ALLUXIO_HOME/bin/alluxio-start.sh worker"
+su - alluxio bash -c "$ALLUXIO_HOME/bin/alluxio-start.sh job_worker"
 
 #
 # Wait forever

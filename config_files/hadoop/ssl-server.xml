@@ -20,7 +20,7 @@
 
 <property>
   <name>ssl.server.truststore.location</name>
-  <value>/usr/local/hadoop/lib/keystore.jks</value>
+  <value>/opt/hadoop/lib/keystore.jks</value>
   <description>Truststore to be used by NN and DN. Must be specified.
   </description>
 </property>
@@ -49,7 +49,7 @@
 
 <property>
   <name>ssl.server.keystore.location</name>
-  <value>/usr/local/hadoop/lib/keystore.jks</value>
+  <value>/opt/hadoop/lib/keystore.jks</value>
   <description>Keystore to be used by NN and DN. Must be specified.
   </description>
 </property>

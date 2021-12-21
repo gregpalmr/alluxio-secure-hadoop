@@ -26,19 +26,36 @@ services:
       - "/etc/localtime:/etc/localtime:ro"
       - "keytabs:/etc/security/keytabs"
 
-  hadoop:
+  mysql:
     networks:
       custom:
         ipv4_address: 172.22.0.3
-    image: myalluxio/alluxio-secure-hadoop:2.7.4
+    image: mysql:5.7
+    restart: always
+    hostname: mysql
+    domainname: docker.com
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: changeme123
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - mysql_data:/var/lib/mysql
+
+  hadoop:
+    networks:
+      custom:
+        ipv4_address: 172.22.0.4
+    image: myalluxio/alluxio-secure-hadoop:hadoop-2.7.4
     depends_on: 
       - kdc
+      - mysql
     hostname: hadoop
     domainname: docker.com
     container_name: hadoop
     tty: true
     extra_hosts:
       - "kdc.kerberos.com kdc:172.22.0.2"
+      - "mysql.docker.com mysql:172.22.0.3"
     environment:
       KRB_REALM: EXAMPLE.COM
       DOMAIN_REALM: kdc.kerberos.com
@@ -88,8 +105,8 @@ services:
   alluxio:
     networks:
       custom:
-        ipv4_address: 172.22.0.4
-    image: myalluxio/alluxio-secure-hadoop:2.7.4
+        ipv4_address: 172.22.0.5
+    image: myalluxio/alluxio-secure-hadoop:hadoop-2.7.4
     shm_size: '1gb'
     depends_on:
       - kdc
@@ -99,7 +116,7 @@ services:
     tty: true
     extra_hosts:
       - "kdc.kerberos.com kdc:172.22.0.2"
-      - "hadoop.docker.com hadoop:172.22.0.3"
+      - "hadoop.docker.com hadoop:172.22.0.4"
     environment:
       KRB_REALM: EXAMPLE.COM
       DOMAIN_REALM: kdc.kerberos.com
@@ -124,5 +141,7 @@ services:
     command: ["/bootstrap.sh"]
 
 volumes:
+  mysql_data:
+    driver: local
   keytabs:
     driver: local
