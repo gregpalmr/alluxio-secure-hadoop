@@ -117,13 +117,13 @@ Open a command shell into the Alluxio container and execute the /etc/profile scr
 
      source /etc/profile
 
-Create a Kerberos principal for the test Alluxio user:
-
-     kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -pw ${NON_ROOT_PASSWORD} alluxio-user1@${KRB_REALM}"
-
 Become the test Alluxio user:
 
      su - alluxio-user1
+
+Destroy any Kerberos ticket.
+
+     kdestroy
 
 Attempt to read the Alluxio virtual filesystem.
 
@@ -174,14 +174,6 @@ See that the file has been persisted using the Alluxio command and the HDFS comm
      alluxio fs ls /user/alluxio-user1/
 
      hdfs dfs -ls /user/alluxio-user1/
-
----
-
-KNOWN ISSUES:
-
-- In the bootstrap-alluxio.sh script, the kadmin command to create the principal for the alluxio-user1 user, is erroring out with the message:
-
-     kadmin: unable to get default realm
 
 ---
 
