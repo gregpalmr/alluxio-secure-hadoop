@@ -99,16 +99,17 @@ su - alluxio bash -c "kinit -kt ${KEYTAB_DIR}/alluxio.service.keytab alluxio/$(h
 # Format the master node journal
 su - alluxio bash -c "$ALLUXIO_HOME/bin/alluxio formatJournal"
 
-# Start the master node daemons
+# Start the Alluxio master node daemons
 su - alluxio bash -c "$ALLUXIO_HOME/bin/alluxio-start.sh master"
 su - alluxio bash -c "$ALLUXIO_HOME/bin/alluxio-start.sh job_master"
-su - alluxio bash -c "$ALLUXIO_HOME/bin/alluxio-start.sh proxy"
 
 # Format the worker node ramdisk
 #$ALLUXIO_HOME/bin/alluxio formatWorker
 
+# Start the alluxio worker daemons and proxy daemon
 su - alluxio bash -c "$ALLUXIO_HOME/bin/alluxio-start.sh worker"
 su - alluxio bash -c "$ALLUXIO_HOME/bin/alluxio-start.sh job_worker"
+su - alluxio bash -c "$ALLUXIO_HOME/bin/alluxio-start.sh proxy"
 
 #
 # Wait forever
