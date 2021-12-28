@@ -70,7 +70,7 @@ if [ -f /tmp/config_files/alluxio/alluxio-enterprise-license.json ]; then
         cp /tmp/config_files/alluxio/alluxio-enterprise-license.json $ALLUXIO_HOME/license.json
 fi
 
-# Configure  kerberos client
+# Configure kerberos client
 cp -f /tmp/config_files/kdc/krb5.conf /etc/krb5.conf
 sed -i "s/EXAMPLE.COM/${KRB_REALM}/g" /etc/krb5.conf
 sed -i "s/example.com/${DOMAIN_REALM}/g" /etc/krb5.conf
@@ -82,9 +82,8 @@ chown alluxio:root alluxio.service.keytab
 chmod 400 alluxio.service.keytab
 mv alluxio.service.keytab ${KEYTAB_DIR}/
 
-# Create an alluxio user, for testing purposes
-useradd alluxio-user1
-kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -pw ${NON_ROOT_PASSWORD} alluxio-user1@${KRB_REALM}"
+# Create a kerberos principal for the test Alluxio user
+kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -pw ${NON_ROOT_PASSWORD} user1@${KRB_REALM}"
 
 # Configure the alluxio-site.properties file
 cp /tmp/config_files/alluxio/alluxio-site.properties $ALLUXIO_HOME/conf/alluxio-site.properties

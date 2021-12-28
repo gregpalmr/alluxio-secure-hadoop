@@ -1,5 +1,5 @@
 # alluxio-secure-hadoop
-Test Alluxio Enterprise with Apache Hadoop 2.7.4 in secure mode
+Test Alluxio Enterprise with Apache Hadoop 2.10.1 in secure mode
 
 This repo contains docker compose artifacts that build and launch a small Alluxio cluster that runs against a Hadoop environment with Kerberos enabled and SSL connections enforced (dfs.http.policy=HTTPS_ONLY)
 
@@ -72,9 +72,25 @@ c. Add an environment variable identifying the tarball file name. For example:
 
 ### Step 5. Build the docker image
 
-Build the docker image used for the Hadoop instances and the Alluxio instance.
+The Dockerfile script is setup to copy tarballs and zip files from the local_files directory, if they exist. If they do not exist, the Dockerfile will use the curl command to download the tarballs and zip files from various locations, which takes some time. If you would like to save time while building the Docker image, you can pre-load the various tarballs with these commands:
 
-     docker build -t myalluxio/alluxio-secure-hadoop:hadoop-2.7.4 . 2>&1 | tee  ./build-log.txt
+     mkdir -p local_files && cd local_files
+
+     curl -L "oraclelicense=a" http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.rpm -O
+     curl -L "oraclelicense=a" http://download.oracle.com/otn-pub/java/jce/8/jce_policy-8.zip -O
+     curl -L https://archive.apache.org/dist/hadoop/core/hadoop-2.10.1/hadoop-2.10.1.tar.gz -O
+     curl -L https://archive.apache.org/dist/hadoop/core/hadoop-2.10.1/hadoop-2.10.1-src.tar.gz -O
+     curl -L https://github.com/google/protobuf/releases/download/v2.5.0/protobuf-2.5.0.tar.gz -O
+     curl -L https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.5.0/apache-maven-3.5.0-bin.tar.gz -O
+     curl -L http://repo.mysql.com/yum/mysql-5.7-community/el/7/x86_64/mysql57-community-release-el7-7.noarch.rpm -O
+     curl -L https://archive.apache.org/dist/hive/hive-2.3.8/apache-hive-2.3.8-bin.tar.gz -O
+     curl -L https://downloads.alluxio.io/protected/files/alluxio-enterprise-trial.tar.gz -O
+
+     cd ..
+
+Then, build the docker image used for the Hadoop instances and the Alluxio instance.
+
+     docker build -t myalluxio/alluxio-secure-hadoop:hadoop-2.10.1 . 2>&1 | tee  ./build-log.txt
 
 Note: if you run out of Docker volume space, run this command:
 
@@ -119,7 +135,7 @@ Open a command shell into the Alluxio container and execute the /etc/profile scr
 
 Become the test Alluxio user:
 
-     su - alluxio-user1
+     su - user1
 
 Destroy any Kerberos ticket.
 
@@ -155,25 +171,25 @@ The above command shows Alluxio access the kerberized Hadoop environment that ha
 
 Create a directory for the Alluxio user:
 
-     alluxio fs mkdir /user/alluxio-user1
+     alluxio fs mkdir /user/user1
 
 Copy a file to the new directory:
 
-     alluxio fs copyFromLocal /etc/motd /user/alluxio-user1/
+     alluxio fs copyFromLocal /etc/motd /user/user1/
 
 List the files in the new directory (notice that the motd file is not persisted yet):
 
-     alluxio fs ls /user/alluxio-user1/
+     alluxio fs ls /user/user1/
 
 Cause the file to be persisted (written to the under filesystem or HDFS):
 
-     alluxio fs persist /user/alluxio-user1/
+     alluxio fs persist /user/user1/
 
 See that the file has been persisted using the Alluxio command and the HDFS commands:
 
-     alluxio fs ls /user/alluxio-user1/
+     alluxio fs ls /user/user1/
 
-     hdfs dfs -ls /user/alluxio-user1/
+     hdfs dfs -ls /user/user1/
 
 ---
 

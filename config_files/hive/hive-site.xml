@@ -13,7 +13,7 @@
 
 <property>
   <name>javax.jdo.option.ConnectionURL</name>
-  <value>jdbc:mysql://hadoop/hive_metastore?createDatabaseIfNotExist=true</value>
+  <value>jdbc:mysql://mysql.docker.com:3306/hive_metastore?useSSL=false</value>
 </property>
 
 <property>
@@ -44,7 +44,7 @@
 
 <property>
   <name>hive.metastore.schema.verification</name>
-  <value>true</value>
+  <value>false</value>
 </property>
 
 <property>
@@ -68,8 +68,7 @@
 </property>
 
 <property>
-  <name>hive.server2.enable.impersonation</name>
-  <description>Enable user impersonation for HiveServer2</description>
+  <name>hive.server2.enable.doAs</name>
   <value>true</value>
 </property>
 

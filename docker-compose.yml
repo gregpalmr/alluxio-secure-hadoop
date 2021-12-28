@@ -45,7 +45,7 @@ services:
     networks:
       custom:
         ipv4_address: 172.22.0.4
-    image: myalluxio/alluxio-secure-hadoop:hadoop-2.7.4
+    image: myalluxio/alluxio-secure-hadoop:hadoop-2.10.1
     depends_on: 
       - kdc
       - mysql
@@ -62,8 +62,8 @@ services:
       FQDN: hadoop.docker.com
       HADOOP_FQDN: hadoop.docker.com
     volumes:
+      - "./config_files:/tmp/config_files"
       - "/etc/localtime:/etc/localtime:ro"
-      - "./config_files/kdc/krb5.conf:/etc/krb5.conf"
       - "./bootstrap-hadoop.sh:/bootstrap.sh"
       - "keytabs:/etc/security/keytabs"
     expose:
@@ -106,7 +106,7 @@ services:
     networks:
       custom:
         ipv4_address: 172.22.0.5
-    image: myalluxio/alluxio-secure-hadoop:hadoop-2.7.4
+    image: myalluxio/alluxio-secure-hadoop:hadoop-2.10.1
     shm_size: '1gb'
     depends_on:
       - kdc
