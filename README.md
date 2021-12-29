@@ -145,7 +145,7 @@ Attempt to read the Alluxio virtual filesystem.
 
      alluxio fs ls /user/
 
-     < you will see a permission denied error >
+     < you will see a "authentication failed" error >
 
 Acquire a Kerberos ticket.
 
@@ -157,7 +157,7 @@ Show the valid Kerberos ticket:
 
      klist
 
-Attempt to read the Alluxio virtual filesystem.
+Attempt to read the Alluxio virtual filesystem again.
 
      alluxio fs ls /user/
 
@@ -171,23 +171,21 @@ The above command shows Alluxio accessing the kerberized Hadoop environment that
       hadoop.security.authorization       = true
       hadoop.security.authentication      = kerberos
 
-Create a directory for the Alluxio user:
-
-     alluxio fs mkdir /user/user1
-
-Copy a file to the new directory:
+Copy a file to the user's home directory:
 
      alluxio fs copyFromLocal /etc/motd /user/user1/
 
-List the files in the new directory (notice that the motd file is not persisted yet):
+List the files in the user's home directory (notice that the motd file is indicated as NOT_PERSISTED, and does NOT show up in the HDFS listing):
 
      alluxio fs ls /user/user1/
+
+     hdfs dfs -ls /user/user1/
 
 Cause the file to be persisted (written to the under filesystem or HDFS):
 
      alluxio fs persist /user/user1/
 
-See that the file has been persisted using the Alluxio command and the HDFS commands:
+See that the file has been persisted using the Alluxio command and the HDFS commands (notice that the motd file is indicated as PERSISTED, and shows up in the HDFS listing):
 
      alluxio fs ls /user/user1/
 
@@ -199,12 +197,12 @@ a. Setup a test data file in Alluxio and HDFS
 
 As a test user, create a small test data file
 
-     docker exec -it hadoop bash
+     docker exec -it alluxio bash
 
      su - user1
 
      kinit
-     <enter kerberos password>
+     < enter the user's kerberos password: it defaults to "changeme123" >
 
      echo "1,Jane Doe,jdoe@email.com,555-1234"               > alluxio_table.csv
      echo "2,Frank Sinclair,fsinclair@email.com,555-4321"   >> alluxio_table.csv
@@ -212,7 +210,7 @@ As a test user, create a small test data file
 
 Create a directory in HDFS and upload the data file
 
-     alluxio fs ls -f /user/user1/
+     alluxio fs ls -f /user/user1/  # needed to avoid permissions error
 
      alluxio fs mkdir /user/user1/alluxio_table/
 
@@ -272,6 +270,8 @@ Create a table in Hive that points to the Alluxio virtual filesystem
 
      SELECT * FROM alluxio_table2;
 
+     SELECT * FROM alluxio_table2 WHERE NAME LIKE '%Frank%';
+
      DROP TABLE alluxio_table2;
 
 If you have any issues, you can inspect the Hiveserver2 log file using the commands:
@@ -296,6 +296,13 @@ The Alluxio client jar file is in:
 
      /opt/alluxio/client
 
+---
+
+KNOWN ISSUES:
+
+- In Step 8.a, a permissions error will result if you don't first run this command (there is an open JIRA on it):
+
+     alluxio fs ls -f /user/user1/  
 
 
 ---
