@@ -37,7 +37,7 @@ RUN    ssh-keygen -q -N "" -t dsa -f /etc/ssh/ssh_host_dsa_key \
 
 # Copy any local tarballs into the container (Not Required)
 RUN mkdir /tmp/local_files
-COPY README.md local_files/* /tmp/local_files/
+COPY README.md local_files* /tmp/local_files/
 
 # Install Java
 ARG THIS_JAVA_HOME=/usr/java/default
