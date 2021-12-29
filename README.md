@@ -1,7 +1,7 @@
 # alluxio-secure-hadoop
 Test Alluxio Enterprise with Apache Hadoop 2.10.1 in secure mode
 
-This repo contains docker compose artifacts that build and launch a small Alluxio cluster that runs against a Hadoop environment with Kerberos enabled and SSL connections enforced (dfs.http.policy=HTTPS_ONLY)
+This repo contains docker compose artifacts that build and launch a small Alluxio cluster that runs against a secure Hadoop environment with Kerberos enabled and SSL connections enforced.
 
 
 ## Usage:
@@ -11,6 +11,13 @@ This repo contains docker compose artifacts that build and launch a small Alluxi
 #### MAC:
 
 See: https://docs.docker.com/desktop/mac/install/
+
+Note: The default docker resources will not be adequate. You must increase them to:
+
+     - CPUs:   8
+     - Memory: 8 GB
+     - Swap:   2 GB
+     - Disk Image Size: 150 GB
 
 #### LINUX:
 
@@ -98,7 +105,17 @@ Note: if you run out of Docker volume space, run this command:
 
 ### Step 6. Start the kdc, hadoop and alluxio containers
 
-Use the docker-compose command to start the kdc, hadoop and alluxio containers.
+Remove any existing volumes for these containers
+
+     docker volume rmalluxio-secure-hadoop_hdfs_storage
+
+     docker volume rmalluxio-secure-hadoop_kdc_storage
+
+     docker volume rmalluxio-secure-hadoop_keytabs
+
+     docker volume rmalluxio-secure-hadoop_mysql_data
+
+Use the docker-compose command to start the kdc, mysql, hadoop and alluxio containers.
 
      docker-compose up -d
 
@@ -120,10 +137,13 @@ When finished working with the containers, you can stop them with the commands:
 
 If you are done testing and do not intend to spin up the docker images again, remove the disk volumes with the commands:
 
-     docker volume rm alluxio-secure-hadoop_keytabs  
+     docker volume rmalluxio-secure-hadoop_hdfs_storage
 
-     docker volume rm alluxio-secure-hadoop_mysql_data
+     docker volume rmalluxio-secure-hadoop_kdc_storage
 
+     docker volume rmalluxio-secure-hadoop_keytabs
+
+     docker volume rmalluxio-secure-hadoop_mysql_data
 
 ### Step 7. Test Alluxio access to the secure Hadoop environment 
 
@@ -253,8 +273,6 @@ Create a table in Hive that points to the HDFS location
 
      SELECT * FROM alluxio_table1;
 
-     DROP TABLE alluxio_table1;
-
 Create a table in Hive that points to the Alluxio virtual filesystem 
 
      USE alluxio_test_db;
@@ -271,8 +289,6 @@ Create a table in Hive that points to the Alluxio virtual filesystem
      SELECT * FROM alluxio_table2;
 
      SELECT * FROM alluxio_table2 WHERE NAME LIKE '%Frank%';
-
-     DROP TABLE alluxio_table2;
 
 If you have any issues, you can inspect the Hiveserver2 log file using the commands:
 
@@ -300,7 +316,7 @@ The Alluxio client jar file is in:
 
 KNOWN ISSUES:
 
-- In Step 8.a, a permissions error will result if you don't first run this command (there is an open JIRA on it):
+- In Step 8.a, a "permission denied" error will result if you don't first run this command (there is an open JIRA on it):
 
      alluxio fs ls -f /user/user1/  
 
