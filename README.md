@@ -272,6 +272,26 @@ Create a table in Hive that points to the Alluxio virtual filesystem
 
      DROP TABLE alluxio_table2;
 
+If you have any issues, you can inspect the Hiveserver2 log file using the commands:
+
+     docker exec -it hadoop bash
+
+     vi /tmp/hive/hive.log
+
+The Hiveserver2 config files are in:
+
+     /etc/hive/conf
+
+The Hiveserver2 Alluxio config files are in:
+
+     /etc/alluxio (soft link to /opt/alluxio/conf)
+
+The Alluxio client jar file is in:
+
+     /opt/alluxio/client
+
+
+
 ---
 
 Please direct questions and comments to greg.palmer@alluxio.com
