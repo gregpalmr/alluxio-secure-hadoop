@@ -125,7 +125,7 @@ If you are done testing and do not intend to spin up the docker images again, re
      docker volume rm alluxio-secure-hadoop_mysql_data
 
 
-#### Step 7. Test Alluxio access to the secure Hadoop environment 
+### Step 7. Test Alluxio access to the secure Hadoop environment 
 
 Open a command shell into the Alluxio container and execute the /etc/profile script.
 
@@ -163,11 +163,13 @@ Attempt to read the Alluxio virtual filesystem.
 
      < you will see the contents of the /user HDFS directory >
 
-The above command shows Alluxio access the kerberized Hadoop environment that had the following HDFS properties configured:
+The above command shows Alluxio accessing the kerberized Hadoop environment that had the following HDFS properties configured:
 
       dfs.encrypt.data.transfer           = true
       dfs.encrypt.data.transfer.algorithm = 3des
       dfs.http.policy set                 = HTTPS_ONLY
+      hadoop.security.authorization       = true
+      hadoop.security.authentication      = kerberos
 
 Create a directory for the Alluxio user:
 
@@ -191,7 +193,7 @@ See that the file has been persisted using the Alluxio command and the HDFS comm
 
      hdfs dfs -ls /user/user1/
 
-#### Step 8. Test Hive access to the Alluxio virtual filesystem
+### Step 8. Test Hive access to the Alluxio virtual filesystem
 
 a. Setup a test data file in Alluxio and HDFS
 
