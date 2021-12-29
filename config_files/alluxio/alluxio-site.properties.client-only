@@ -3,9 +3,8 @@
 
 alluxio.master.hostname=alluxio
 alluxio.security.authentication.type=KERBEROS
-alluxio.security.authorization.permission.enabled=true
-alluxio.security.kerberos.unified.instance.name=localhost
-alluxio.security.kerberos.client.principal=hive/localhost@EXAMPLE.COM
+alluxio.security.kerberos.unified.instance.name=alluxio.docker.com
+alluxio.security.kerberos.client.principal=hive/hadoop.docker.com@EXAMPLE.COM
 alluxio.security.kerberos.client.keytab.file=/etc/security/keytabs/hive.service.keytab
 alluxio.user.file.writetype.default=ASYNC_THROUGH
 alluxio.user.file.readtype.default=CACHE

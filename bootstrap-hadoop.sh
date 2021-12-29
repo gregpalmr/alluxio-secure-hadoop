@@ -15,11 +15,13 @@ if [ "$?" != 0 ];then
 fi
 source /etc/profile
 
-# Turn HDFS client Debug mode on (uncomment these if you want to debug ssl or kerberos)
+## Turn on HDFS client Debug mode (uncomment these if you want to debug ssl or kerberos)
 #echo "export HADOOP_OPTS=\"$HADOOP_OPTS -Djavax.net.debug=ssl\"" >> $HADOOP_HOME/etc/hadoop/hadoop-env.sh
-echo "export HADOOP_OPTS=\"$HADOOP_OPTS -Dsun.security.krb5.debug=true\"" >> $HADOOP_HOME/etc/hadoop/hadoop-env.sh
+#echo "export HADOOP_OPTS=\"$HADOOP_OPTS -Dsun.security.krb5.debug=true\"" >> $HADOOP_HOME/etc/hadoop/hadoop-env.sh
+
+## Turn on Hive Debug mode (uncomment these if you want to debug ssl or kerberos)
 #echo "export HIVE_OPTS=\"$HIVE_OPTS -Djavax.net.debug=ssl\"" >> $HADOOP_HOME/etc/hive/conf/hive-env.sh
-echo "export HIVE_OPTS=\"$HIVE_OPTS -Dsun.security.krb5.debug=true\"" >> $HADOOP_HOME/etc/hive/conf/hive-env.sh
+#echo "export HIVE_OPTS=\"$HIVE_OPTS -Dsun.security.krb5.debug=true\"" >> $HADOOP_HOME/etc/hive/conf/hive-env.sh
 
 # installing libraries if any - (resource urls added comma separated to the ACP system variable)
 cd $HADOOP_HOME/share/hadoop/common ; for cp in ${ACP//,/ }; do  echo == $cp; curl -LO $cp ; done; cd -

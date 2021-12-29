@@ -52,6 +52,15 @@ do
   fi
 done
 
+# Add Alluxio client jar file to classpath
+CLIENT_JAR=$(ls $ALLUXIO_HOME/client/alluxio-enterprise-*-client.jar)
+CLIENT_JAR=$(basename $CLIENT_JAR)
+if [ "$HADOOP_CLASSPATH" == "" ]; then
+  export HADOOP_CLASSPATH=${ALLUXIO_HOME}/client/${CLIENT_JAR}
+else
+  export HADOOP_CLASSPATH=${HADOOP_CLASSPATH}${ALLUXIO_HOME}/client/${CLIENT_JAR}
+fi
+
 # The maximum amount of heap to use, in MB. Default is 1000.
 #export HADOOP_HEAPSIZE=
 #export HADOOP_NAMENODE_INIT_HEAPSIZE=""

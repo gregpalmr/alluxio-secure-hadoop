@@ -6,7 +6,8 @@
 
     <property>
       <name>yarn.application.classpath</name>
-      <value>/opt/hadoop/etc/hadoop, /opt/hadoop/share/hadoop/common/*, /opt/hadoop/share/hadoop/common/lib/*, /opt/hadoop/share/hadoop/hdfs/*, /opt/hadoop/share/hadoop/hdfs/lib/*, /opt/hadoop/share/hadoop/mapreduce/*, /opt/hadoop/share/hadoop/mapreduce/lib/*, /opt/hadoop/share/hadoop/yarn/*, /opt/hadoop/share/hadoop/yarn/lib/*</value>
+      <value>/opt/hadoop/etc/hadoop, /opt/hadoop/share/hadoop/common/*, /opt/hadoop/share/hadoop/common/lib/*, /opt/hadoop/share/hadoop/hdfs/*, /opt/hadoop/share/hadoop/hdfs/lib/*, /opt/hadoop/share/hadoop/mapreduce/*, /opt/hadoop/share/hadoop/mapreduce/lib/*, /opt/hadoop/share/hadoop/yarn/*, /opt/hadoop/share/hadoop/yarn/lib/*, /opt/alluxio/client/alluxio-enterprise-*-client.jar
+      </value>
     </property>
 
     <property>
