@@ -15,9 +15,11 @@ if [ "$?" != 0 ];then
 fi
 source /etc/profile
 
-# HDFS client Debug mode on
-#$HADOOP_HOME/etc/hadoop/hadoop-env.sh
-#echo "export HADOOP_OPTS=\"$HADOOP_OPTS -Djavax.net.debug=ssl -Dsun.security.krb5.debug=true\"" >> $HADOOP_HOME/etc/hadoop/hadoop-env.sh
+# Turn HDFS client Debug mode on (uncomment these if you want to debug ssl or kerberos)
+#echo "export HADOOP_OPTS=\"$HADOOP_OPTS -Djavax.net.debug=ssl\"" >> $HADOOP_HOME/etc/hadoop/hadoop-env.sh
+echo "export HADOOP_OPTS=\"$HADOOP_OPTS -Dsun.security.krb5.debug=true\"" >> $HADOOP_HOME/etc/hadoop/hadoop-env.sh
+#echo "export HIVE_OPTS=\"$HIVE_OPTS -Djavax.net.debug=ssl\"" >> $HADOOP_HOME/etc/hive/conf/hive-env.sh
+echo "export HIVE_OPTS=\"$HIVE_OPTS -Dsun.security.krb5.debug=true\"" >> $HADOOP_HOME/etc/hive/conf/hive-env.sh
 
 # installing libraries if any - (resource urls added comma separated to the ACP system variable)
 cd $HADOOP_HOME/share/hadoop/common ; for cp in ${ACP//,/ }; do  echo == $cp; curl -LO $cp ; done; cd -
@@ -186,11 +188,15 @@ hdfs dfs -chown user1 /user/user1
 
 # Start Hive metastore and hiveserver2 (log file will be in /tmp/hive/hive.log)
 su - hive -c " . /etc/profile && kinit -kt /etc/security/keytabs/hive.service.keytab hive/hadoop.docker.com@EXAMPLE.COM"
+
 echo &&  echo " ### Starting Hive Metastore"
-su - hive -c " . /etc/profile && nohup $HIVE_HOME/bin/hive --service metastore  >/dev/null 2>&1 &"
+#su - hive -c " . /etc/profile && nohup $HIVE_HOME/bin/hive --service metastore  >/dev/null 2>&1 &"
+su - hive -c " . /etc/profile && nohup $HIVE_HOME/bin/hive --service metastore  > ./metastore-nohup.out 2>&1 &"
+
 echo && echo " ### Starting Hiveserver2"
 sleep 3
-su - hive -c " . /etc/profile && nohup $HIVE_HOME/bin/hive --service hiveserver2  >/dev/null 2>&1 &"
+#su - hive -c " . /etc/profile && nohup $HIVE_HOME/bin/hive --service hiveserver2  >/dev/null 2>&1 &"
+su - hive -c " . /etc/profile && nohup $HIVE_HOME/bin/hive --service hiveserver2  > ./hiveserver2-nohup.out 2>&1 &"
 
 echo
 echo
