@@ -96,13 +96,17 @@ nohup /usr/sbin/sshd -D >/dev/null 2>&1 &
 #
 
 # Save a copy of the Alluxio client jar file, referenced in hive-env.sh
-cp $ALLUXIO_HOME/client/alluxio-enterprise-*-client.jar /tmp/
-cp $ALLUXIO_HOME/conf/alluxio-site.properties /tmp/
+CLIENT_JAR=$(ls $ALLUXIO_HOME/client/alluxio-enterprise-*-client.jar)
+CLIENT_JAR=$(basename $CLIENT_JAR)
+echo
+echo " ### Setting up Alluxio client environment in /etc/alluxio/alluxio-site.properties and /opt/alluxio/client/$CLIENT_JAR"
+cp $ALLUXIO_HOME/client/$CLIENT_JAR /tmp/
+cp $ALLUXIO_HOME/conf/alluxio-site.properties.client-only /tmp/
 rm -rf /opt/alluxio-enterprise* /opt/alluxio
 mkdir -p $ALLUXIO_HOME/client
-mv /tmp/alluxio-enterprise-*-client.jar $ALLUXIO_HOME/client/
+mv /tmp/$CLIENT_JAR $ALLUXIO_HOME/client/
 mkdir -p $ALLUXIO_HOME/conf
-mv /tmp/alluxio-site.properties $ALLUXIO_HOME/client/
+mv /tmp/alluxio-site.properties.client-only $ALLUXIO_HOME/conf/alluxio-site.properties
 
 # Remove the duplicate log4j jar file
 rm -f $HIVE_HOME/lib/log4j-slf4j-impl-2.6.2.jar
@@ -168,14 +172,17 @@ echo && echo " ### Starting MapReduce Job History Server  daemon"
 $HADOOP_HOME/sbin/mr-jobhistory-daemon.sh start historyserver
 sleep 5
 
-# Make some HDFS directories
+# Make some HDFS directories - add the sticky bit to /tmp and /user
 echo changeme123 | kinit
 hdfs dfs -mkdir -p /tmp
-hdfs dfs -chmod 777 /tmp
+hdfs dfs -chmod 1777 /tmp
 hdfs dfs -mkdir -p /user
-hdfs dfs -chmod 755 /user
+hdfs dfs -chmod 1777 /user
 hdfs dfs -mkdir -p /user/hive/warehouse
 hdfs dfs -chown -R hive:hadoop /user/hive
+hdfs dfs -chmod 1777 /user/hive/warehouse
+hdfs dfs -mkdir /user/user1
+hdfs dfs -chown user1 /user/user1
 
 # Start Hive metastore and hiveserver2 (log file will be in /tmp/hive/hive.log)
 su - hive -c " . /etc/profile && kinit -kt /etc/security/keytabs/hive.service.keytab hive/hadoop.docker.com@EXAMPLE.COM"

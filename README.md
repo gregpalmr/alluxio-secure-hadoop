@@ -191,6 +191,87 @@ See that the file has been persisted using the Alluxio command and the HDFS comm
 
      hdfs dfs -ls /user/user1/
 
+#### Step 8. Test Hive access to the Alluxio virtual filesystem
+
+a. Setup a test data file in Alluxio and HDFS
+
+As a test user, create a small test data file
+
+     docker exec -it hadoop bash
+
+     su - user1
+
+     kinit
+     <enter kerberos password>
+
+     echo "1,Jane Doe,jdoe@email.com,555-1234"               > alluxio_table.csv
+     echo "2,Frank Sinclair,fsinclair@email.com,555-4321"   >> alluxio_table.csv
+     echo "3,Iris Culpepper,icullpepper@email.com,555-3354" >> alluxio_table.csv
+
+Create a directory in HDFS and upload the data file
+
+     alluxio fs ls -f /user/user1/
+
+     alluxio fs mkdir /user/user1/alluxio_table/
+
+     alluxio fs copyFromLocal alluxio_table.csv /user/user1/alluxio_table/
+
+     alluxio fs cat /user/user1/alluxio_table/alluxio_table.csv
+
+Cause Alluxio to persist the data to the under filesystem (HDFS)
+
+     alluxio fs persist /user/user1
+
+Show that the new hdfs file was persisted
+
+     hdfs dfs -ls /user/user1/alluxio_table/alluxio_table.csv
+     
+b. Test Hive with the Alluxio virtual filesystem
+
+Confirm that the user1 user has a valid kerberos ticket
+
+     klist
+
+Start a hive session using beeline
+
+     beeline -u "jdbc:hive2://hadoop.docker.com:10000/default;principal=hive/_HOST@EXAMPLE.COM"
+
+Create a table in Hive that points to the HDFS location
+
+     CREATE DATABASE alluxio_test_db;
+
+     USE alluxio_test_db;
+
+     CREATE EXTERNAL TABLE alluxio_table1 (
+          customer_id BIGINT,
+          name STRING,
+          email STRING,
+          phone STRING ) 
+     ROW FORMAT DELIMITED
+     FIELDS TERMINATED BY ','
+     LOCATION 'hdfs://hadoop.docker.com:9000/user/user1/alluxio_table';
+
+     SELECT * FROM alluxio_table1;
+
+     DROP TABLE alluxio_table1;
+
+Create a table in Hive that points to the Alluxio virtual filesystem 
+
+     USE alluxio_test_db;
+
+     CREATE EXTERNAL TABLE alluxio_table2 (
+          customer_id BIGINT,
+          name STRING,
+          email STRING,
+          phone STRING ) 
+     ROW FORMAT DELIMITED
+     FIELDS TERMINATED BY ','
+     LOCATION 'alluxio://alluxio.docker.com:19998/user/user1/alluxio_table';
+
+     SELECT * FROM alluxio_table2;
+
+     DROP TABLE alluxio_table2;
+
 ---
 
 Please direct questions and comments to greg.palmer@alluxio.com

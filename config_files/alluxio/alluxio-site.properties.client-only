@@ -1,0 +1,13 @@
+# FILE: alluxio-site.properties file for clients (hiveserver1)
+#
+
+alluxio.master.hostname=alluxio
+alluxio.security.authentication.type=KERBEROS
+alluxio.security.authorization.permission.enabled=true
+alluxio.security.kerberos.unified.instance.name=localhost
+alluxio.security.kerberos.client.principal=hive/localhost@EXAMPLE.COM
+alluxio.security.kerberos.client.keytab.file=/etc/security/keytabs/hive.service.keytab
+alluxio.user.file.writetype.default=ASYNC_THROUGH
+alluxio.user.file.readtype.default=CACHE
+
+# end of file

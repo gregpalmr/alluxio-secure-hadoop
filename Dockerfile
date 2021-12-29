@@ -234,14 +234,14 @@ RUN export ALLUXIO_HOME=$THIS_ALLUXIO_HOME \
     && tar xzvf /tmp/local_files/alluxio-enterprise-trial.tar.gz -C /opt \
     && rm -f /tmp/local_files/alluxio-enterprise-trial.tar.gz \
     && ln -s /opt/alluxio-enterprise-* $ALLUXIO_HOME \
-    && mkdir -p /etc/alluxio \
-    && ln -s $ALLUXIO_HOME/conf /etc/alluxio/conf \
+    && ln -s $ALLUXIO_HOME/conf /etc/alluxio \
     && echo "#### Alluxio Environment ####" >> /etc/profile \
     && echo "export ALLUXIO_HOME=/opt/alluxio" >> /etc/profile \
     && echo "export PATH=\$PATH:\$ALLUXIO_HOME/bin" >> /etc/profile 
 
 # Install default alluxio config files
 ADD config_files/alluxio/alluxio-site.properties $THIS_ALLUXIO_HOME/conf/alluxio-site.properties
+ADD config_files/alluxio/alluxio-site.properties.client-only $THIS_ALLUXIO_HOME/conf/alluxio-site.properties.client-only
 ADD config_files/hadoop/core-site.xml $THIS_ALLUXIO_HOME/conf/core-site.xml
 ADD config_files/hadoop/hdfs-site.xml $THIS_ALLUXIO_HOME/conf/hdfs-site.xml
 

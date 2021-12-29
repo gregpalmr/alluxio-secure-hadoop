@@ -56,6 +56,7 @@ services:
     extra_hosts:
       - "kdc.kerberos.com kdc:172.22.0.2"
       - "mysql.docker.com mysql:172.22.0.3"
+      - "alluxio.docker.com alluxio: 172.22.0.5"
     environment:
       KRB_REALM: EXAMPLE.COM
       DOMAIN_REALM: kdc.kerberos.com

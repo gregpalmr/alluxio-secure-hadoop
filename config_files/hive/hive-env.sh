@@ -21,5 +21,16 @@ done
 
 export HADOOP_HEAPSIZE=1024
 export HIVE_OPTS="-hiveconf mapreduce.map.memory.mb=1024 -hiveconf mapreduce.reduce.memory.mb=1024"
-export HIVE_AUX_JARS_PATH=$ALLUXIO_HOME/client/alluxio-enterprise-*-client.jar,$ALLUXIO_HOME/conf/alluxio-site.properties
+if [ "$ALLUXIO_HOME" == "" ]; then
+  $ALLUXIO_HOME=/opt/alluxio
+fi
+CLIENT_JAR=$(ls $ALLUXIO_HOME/client/alluxio-enterprise-*-client.jar)
+CLIENT_JAR=$(basename $CLIENT_JAR)
+if [ "$HIVE_AUX_JARS_PATH" == "" ]; then
+  #export HIVE_AUX_JARS_PATH=${ALLUXIO_HOME}/client/${CLIENT_JAR},${ALLUXIO_HOME}/conf/alluxio-site.properties
+  export HIVE_AUX_JARS_PATH=${ALLUXIO_HOME}/client/${CLIENT_JAR}
+else
+  #export HIVE_AUX_JARS_PATH=${HIVE_AUX_JARS_PATH}${ALLUXIO_HOME}/client/${CLIENT_JAR},${ALLUXIO_HOME}/conf/alluxio-site.properties
+  export HIVE_AUX_JARS_PATH=${HIVE_AUX_JARS_PATH}${ALLUXIO_HOME}/client/${CLIENT_JAR}
+fi
 
