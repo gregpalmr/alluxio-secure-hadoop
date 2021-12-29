@@ -278,7 +278,11 @@ If you have any issues, you can inspect the Hiveserver2 log file using the comma
 
      vi /tmp/hive/hive.log
 
-The Hiveserver2 config files are in:
+     vi /opt/hive/hiveserver2-nohup.out
+
+     vi /opt/hive/metastore-nohup.out
+
+The Hiveserver2 and Hive metastore config files are in:
 
      /etc/hive/conf
 
