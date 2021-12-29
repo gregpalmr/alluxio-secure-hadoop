@@ -1,4 +1,4 @@
-# FILE: alluxio-site.properties file for clients (hiveserver1)
+# FILE: alluxio-site.properties file for clients (hiveserver2)
 #
 
 alluxio.master.hostname=alluxio

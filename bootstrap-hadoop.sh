@@ -50,47 +50,55 @@ sed -i "s#/etc/security/keytabs#${KEYTAB_DIR}#g" $HADOOP_HOME/etc/hadoop/mapred-
 
 sed -i "s#/opt/hadoop/bin/container-executor#${NM_CONTAINER_EXECUTOR_PATH}#g" $HADOOP_HOME/etc/hadoop/yarn-site.xml
 
-# Create kerberos principals and keytabs
-kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -pw ${KERBEROS_ROOT_USER_PASSWORD} root@${KRB_REALM}"
-kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -randkey nn/$(hostname -f)@${KRB_REALM}"
-kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -randkey dn/$(hostname -f)@${KRB_REALM}"
-kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -randkey HTTP/$(hostname -f)@${KRB_REALM}"
-kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -randkey jhs/$(hostname -f)@${KRB_REALM}"
-kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -randkey yarn/$(hostname -f)@${KRB_REALM}"
-kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -randkey rm/$(hostname -f)@${KRB_REALM}"
-kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -randkey nm/$(hostname -f)@${KRB_REALM}"
-kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -randkey hive/$(hostname -f)@${KRB_REALM}"
+# Create kerberos principals and keytabs (if not already created)
+if [ -d ${KEYTAB_DIR} ] && [ -f ${KEYTAB_DIR}/nn.service.keytab ]; then
+  echo && echo " ### Skipping create kerberos principals - they already exists"
+else 
+  echo && echo " ### Creating kerberos principals "
+  kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -pw ${KERBEROS_ROOT_USER_PASSWORD} root@${KRB_REALM}"
+  kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -randkey nn/$(hostname -f)@${KRB_REALM}"
+  kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -randkey dn/$(hostname -f)@${KRB_REALM}"
+  kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -randkey HTTP/$(hostname -f)@${KRB_REALM}"
+  kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -randkey jhs/$(hostname -f)@${KRB_REALM}"
+  kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -randkey yarn/$(hostname -f)@${KRB_REALM}"
+  kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -randkey rm/$(hostname -f)@${KRB_REALM}"
+  kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -randkey nm/$(hostname -f)@${KRB_REALM}"
+  kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -randkey hive/$(hostname -f)@${KRB_REALM}"
 
-kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k nn.service.keytab nn/$(hostname -f)"
-kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k dn.service.keytab dn/$(hostname -f)"
-kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k spnego.service.keytab HTTP/$(hostname -f)"
-kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k jhs.service.keytab jhs/$(hostname -f)"
-kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k yarn.service.keytab yarn/$(hostname -f)"
-kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k rm.service.keytab rm/$(hostname -f)"
-kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k nm.service.keytab nm/$(hostname -f)"
-kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k hive.service.keytab hive/$(hostname -f)"
+  kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k nn.service.keytab nn/$(hostname -f)"
+  kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k dn.service.keytab dn/$(hostname -f)"
+  kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k spnego.service.keytab HTTP/$(hostname -f)"
+  kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k jhs.service.keytab jhs/$(hostname -f)"
+  kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k yarn.service.keytab yarn/$(hostname -f)"
+  kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k rm.service.keytab rm/$(hostname -f)"
+  kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k nm.service.keytab nm/$(hostname -f)"
+  kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k hive.service.keytab hive/$(hostname -f)"
 
-mkdir -p ${KEYTAB_DIR}
-mv nn.service.keytab ${KEYTAB_DIR}
-mv dn.service.keytab ${KEYTAB_DIR}
-mv spnego.service.keytab ${KEYTAB_DIR}
-mv jhs.service.keytab ${KEYTAB_DIR}
-mv yarn.service.keytab ${KEYTAB_DIR}
-mv rm.service.keytab ${KEYTAB_DIR}
-mv nm.service.keytab ${KEYTAB_DIR}
-mv hive.service.keytab ${KEYTAB_DIR}
-chmod 400 ${KEYTAB_DIR}/nn.service.keytab
-chmod 400 ${KEYTAB_DIR}/dn.service.keytab
-chmod 400 ${KEYTAB_DIR}/spnego.service.keytab
-chmod 400 ${KEYTAB_DIR}/jhs.service.keytab
-chmod 400 ${KEYTAB_DIR}/yarn.service.keytab
-chmod 400 ${KEYTAB_DIR}/rm.service.keytab
-chmod 400 ${KEYTAB_DIR}/nm.service.keytab
-chown hive:root ${KEYTAB_DIR}/hive.service.keytab
-chmod 400 ${KEYTAB_DIR}/hive.service.keytab
+  mkdir -p ${KEYTAB_DIR}
+  mv nn.service.keytab ${KEYTAB_DIR}
+  mv dn.service.keytab ${KEYTAB_DIR}
+  mv spnego.service.keytab ${KEYTAB_DIR}
+  mv jhs.service.keytab ${KEYTAB_DIR}
+  mv yarn.service.keytab ${KEYTAB_DIR}
+  mv rm.service.keytab ${KEYTAB_DIR}
+  mv nm.service.keytab ${KEYTAB_DIR}
+  mv hive.service.keytab ${KEYTAB_DIR}
+  chmod 400 ${KEYTAB_DIR}/nn.service.keytab
+  chmod 400 ${KEYTAB_DIR}/dn.service.keytab
+  chmod 400 ${KEYTAB_DIR}/spnego.service.keytab
+  chmod 400 ${KEYTAB_DIR}/jhs.service.keytab
+  chmod 400 ${KEYTAB_DIR}/yarn.service.keytab
+  chmod 400 ${KEYTAB_DIR}/rm.service.keytab
+  chmod 400 ${KEYTAB_DIR}/nm.service.keytab
+  chown hive:root ${KEYTAB_DIR}/hive.service.keytab
+  chmod 400 ${KEYTAB_DIR}/hive.service.keytab
+fi
 
 # Format the namenode
-$HADOOP_HOME/bin/hdfs namenode -format
+if [ ! -d $HADOOP_HOME/data/namenode/current ]; then
+  echo && echo " ### Formatting the HDFS namenode "
+  $HADOOP_HOME/bin/hdfs namenode -format
+fi
 
 # Start the sshd daemon so start-dfs.sh can passwordless ssh
 nohup /usr/sbin/sshd -D >/dev/null 2>&1 &
@@ -113,10 +121,14 @@ mkdir -p $ALLUXIO_HOME/conf
 mv /tmp/alluxio-site.properties.client-only $ALLUXIO_HOME/conf/alluxio-site.properties
 
 # Remove the duplicate log4j jar file
-rm -f $HIVE_HOME/lib/log4j-slf4j-impl-2.6.2.jar
+if [ -f $HIVE_HOME/lib/log4j-slf4j-impl-2.6.2.jar ]; then
+  rm -f $HIVE_HOME/lib/log4j-slf4j-impl-2.6.2.jar
+fi
 
 # Copy the mysql jdbc jar file to the hive lib dir
-cp /usr/share/java/mysql-connector-java.jar $HIVE_HOME/lib/
+if [ ! -f $HIVE_HOME/lib/java/mysql-connector-java.jar ]; then
+  cp /usr/share/java/mysql-connector-java.jar $HIVE_HOME/lib/
+fi
 
 # Create the hive metastore database in mysql
 cat <<EOT > /tmp/mysql_commands.sql
@@ -126,8 +138,6 @@ cat <<EOT > /tmp/mysql_commands.sql
  GRANT ALL ON hive_metastore.* TO 'hiveuser'@'%' WITH GRANT OPTION;
  FLUSH PRIVILEGES;
 EOT
-
-sleep 3 
 
 # Wait for mysql to become available
 max_tries=10
@@ -150,19 +160,20 @@ do
   sleep 3
 done
 
-echo && echo " ### Creating the hive_metastore "
-mysql --host=mysql \
-  --user=root --password=$NON_ROOT_PASSWORD < /tmp/mysql_commands.sql
+result=$(mysql --host=mysql --user=root --password=$NON_ROOT_PASSWORD -e "show databases;" | grep hive_metastore)
+if [ "$result" != "" ];then
+  echo && echo " ### Skipping create hive_metastore, already exists "
+else
+  echo && echo " ### Creating the hive_metastore "
+
+  mysql --host=mysql \
+    --user=root --password=$NON_ROOT_PASSWORD < /tmp/mysql_commands.sql
+
+  # Create the Hive metastore schema in mysql
+  su - hive -c " . /etc/profile && $HIVE_HOME/bin/schematool -dbType mysql -initSchema"
+fi
+
 rm /tmp/mysql_commands.sql
-
-# Create the Hive metastore schema in mysql
-su - hive -c " . /etc/profile && $HIVE_HOME/bin/schematool -dbType mysql -initSchema"
-
-#mysql --host=mysql \
-#  --user=hiveuser --password=$NON_ROOT_PASSWORD \
-#  --database=hive_metastore < \
-#  $HIVE_HOME/scripts/metastore/upgrade/mysql/hive-schema-2.1.0.mysql.sql
-
 
 #
 # Start the hadoop daemons
@@ -178,15 +189,21 @@ sleep 5
 
 # Make some HDFS directories - add the sticky bit to /tmp and /user
 echo changeme123 | kinit
-hdfs dfs -mkdir -p /tmp
-hdfs dfs -chmod 1777 /tmp
-hdfs dfs -mkdir -p /user
-hdfs dfs -chmod 1777 /user
-hdfs dfs -mkdir -p /user/hive/warehouse
-hdfs dfs -chown -R hive:hadoop /user/hive
-hdfs dfs -chmod 1777 /user/hive/warehouse
-hdfs dfs -mkdir /user/user1
-hdfs dfs -chown user1 /user/user1
+result=$(hdfs dfs -ls /user/hive | grep warehouse)
+if [ "$result" != "" ]; then
+  echo && echo " ### Skipping Create HDFS directories (they already exist)"
+else
+  echo && echo " ### Creating HDFS directories (/tmp /user /user/hive etc.)"
+  hdfs dfs -mkdir -p /tmp
+  hdfs dfs -chmod 1777 /tmp
+  hdfs dfs -mkdir -p /user
+  hdfs dfs -chmod 1777 /user
+  hdfs dfs -mkdir -p /user/hive/warehouse
+  hdfs dfs -chown -R hive:hadoop /user/hive
+  hdfs dfs -chmod 1777 /user/hive/warehouse
+  hdfs dfs -mkdir /user/user1
+  hdfs dfs -chown user1 /user/user1
+fi
 
 # Start Hive metastore and hiveserver2 (log file will be in /tmp/hive/hive.log)
 su - hive -c " . /etc/profile && kinit -kt /etc/security/keytabs/hive.service.keytab hive/hadoop.docker.com@EXAMPLE.COM"

@@ -27,6 +27,11 @@
     </property>
 
     <property>
+         <name>dfs.namenode.name.dir</name>
+         <value>/opt/hadoop/data/namenode/</value>
+    </property>
+
+    <property>
          <name>ipc.server.max.response.size</name>
          <value>5242880</value>
     </property>
@@ -127,6 +132,11 @@
          <name>dfs.https.address</name>
          <value>HOSTNAME:50470</value>
          <description>The https address where namenode binds</description>
+    </property>
+
+    <property>
+         <name>dfs.datanode.data.dir</name>
+         <value>/opt/hadoop/data/datanode</value>
     </property>
 
     <property>

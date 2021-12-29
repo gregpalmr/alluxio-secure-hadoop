@@ -25,6 +25,7 @@ services:
       - "/dev/urandom:/dev/random"
       - "/etc/localtime:/etc/localtime:ro"
       - "keytabs:/etc/security/keytabs"
+      - "kdc_storage:/var/kerberos/krb5kdc"
 
   mysql:
     networks:
@@ -66,6 +67,7 @@ services:
       - "./config_files:/tmp/config_files"
       - "/etc/localtime:/etc/localtime:ro"
       - "./bootstrap-hadoop.sh:/bootstrap.sh"
+      - hdfs_storage:/opt/hadoop/data
       - "keytabs:/etc/security/keytabs"
     expose:
      - 50010
@@ -142,7 +144,11 @@ services:
     command: ["/bootstrap.sh"]
 
 volumes:
-  mysql_data:
+  kdc_storage:
     driver: local
   keytabs:
+    driver: local
+  hdfs_storage:
+    driver: local
+  mysql_data:
     driver: local

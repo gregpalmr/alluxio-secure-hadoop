@@ -86,8 +86,8 @@ RUN export HADOOP_PREFIX=$THIS_HADOOP_PREFIX \
     && echo "#### Hadoop Environment ####" >> /etc/profile \
     && echo "export HADOOP_HOME=$HADOOP_HOME" >> /etc/profile \
     && echo "export PATH=\$PATH:\$HADOOP_HOME/bin:\$HADOOP_HOME/sbin" >> /etc/profile \
-    && mkdir $HADOOP_HOME/nm-local-dirs \
-    && mkdir $HADOOP_HOME/nm-log-dirs
+    && mkdir -p $HADOOP_HOME/data/nodemanager/local-dirs \
+    && mkdir -p $HADOOP_HOME/data/nodemanager/log-dirs
 
 ADD config_files/hadoop/* $THIS_HADOOP_PREFIX/etc/hadoop/
 RUN mv $THIS_HADOOP_PREFIX/etc/hadoop/keystore.jks $THIS_HADOOP_PREFIX/lib/keystore.jks

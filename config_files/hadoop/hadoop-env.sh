@@ -53,7 +53,7 @@ do
 done
 
 # Add Alluxio client jar file to classpath
-CLIENT_JAR=$(ls $ALLUXIO_HOME/client/alluxio-enterprise-*-client.jar)
+CLIENT_JAR=$(ls /opt/alluxio/client/alluxio-enterprise-*-client.jar)
 CLIENT_JAR=$(basename $CLIENT_JAR)
 if [ "$HADOOP_CLASSPATH" == "" ]; then
   export HADOOP_CLASSPATH=${ALLUXIO_HOME}/client/${CLIENT_JAR}
