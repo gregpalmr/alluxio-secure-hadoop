@@ -107,13 +107,13 @@ Note: if you run out of Docker volume space, run this command:
 
 Remove any existing volumes for these containers
 
-     docker volume rmalluxio-secure-hadoop_hdfs_storage
+     docker volume rm alluxio-secure-hadoop_hdfs_storage
 
-     docker volume rmalluxio-secure-hadoop_kdc_storage
+     docker volume rm alluxio-secure-hadoop_kdc_storage
 
-     docker volume rmalluxio-secure-hadoop_keytabs
+     docker volume rm alluxio-secure-hadoop_keytabs
 
-     docker volume rmalluxio-secure-hadoop_mysql_data
+     docker volume rm alluxio-secure-hadoop_mysql_data
 
 Use the docker-compose command to start the kdc, mysql, hadoop and alluxio containers.
 
@@ -137,13 +137,13 @@ When finished working with the containers, you can stop them with the commands:
 
 If you are done testing and do not intend to spin up the docker images again, remove the disk volumes with the commands:
 
-     docker volume rmalluxio-secure-hadoop_hdfs_storage
+     docker volume rm alluxio-secure-hadoop_hdfs_storage
 
-     docker volume rmalluxio-secure-hadoop_kdc_storage
+     docker volume rm alluxio-secure-hadoop_kdc_storage
 
-     docker volume rmalluxio-secure-hadoop_keytabs
+     docker volume rm alluxio-secure-hadoop_keytabs
 
-     docker volume rmalluxio-secure-hadoop_mysql_data
+     docker volume rm alluxio-secure-hadoop_mysql_data
 
 ### Step 7. Test Alluxio access to the secure Hadoop environment 
 
