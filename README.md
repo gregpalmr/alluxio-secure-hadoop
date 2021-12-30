@@ -105,7 +105,7 @@ Note: if you run out of Docker volume space, run this command:
 
 ### Step 6. Start the kdc, hadoop and alluxio containers
 
-Remove any existing volumes for these containers
+a. Remove any existing volumes for these containers
 
      docker volume rm alluxio-secure-hadoop_hdfs_storage
 
@@ -115,27 +115,27 @@ Remove any existing volumes for these containers
 
      docker volume rm alluxio-secure-hadoop_mysql_data
 
-Use the docker-compose command to start the kdc, mysql, hadoop and alluxio containers.
+b. Use the docker-compose command to start the kdc, mysql, hadoop and alluxio containers.
 
      docker-compose up -d
 
-You can see the log output of the Alluxio container using this command:
+c. You can see the log output of the Alluxio container using this command:
 
      docker logs -f alluxio
 
-You can see the log output of the Hadoop container using this command:
+d. You can see the log output of the Hadoop container using this command:
 
      docker logs -f hadoop
 
-You can see the log output of the Kerberos kdc container using this command:
+e. You can see the log output of the Kerberos kdc container using this command:
 
      docker logs -f kdc
 
-When finished working with the containers, you can stop them with the commands:
+f. When finished working with the containers, you can stop them with the commands:
 
      docker-compose down
 
-If you are done testing and do not intend to spin up the docker images again, remove the disk volumes with the commands:
+g. If you are done testing and do not intend to spin up the docker images again, remove the disk volumes with the commands:
 
      docker volume rm alluxio-secure-hadoop_hdfs_storage
 
@@ -147,43 +147,43 @@ If you are done testing and do not intend to spin up the docker images again, re
 
 ### Step 7. Test Alluxio access to the secure Hadoop environment 
 
-Open a command shell into the Alluxio container and execute the /etc/profile script.
+a. Open a command shell into the Alluxio container and execute the /etc/profile script.
 
      docker exec -it alluxio bash
 
      source /etc/profile
 
-Become the test Alluxio user:
+b. Become the test Alluxio user:
 
      su - user1
 
-Destroy any Kerberos ticket.
+c. Destroy any Kerberos ticket.
 
      kdestroy
 
-Attempt to read the Alluxio virtual filesystem.
+d. Attempt to read the Alluxio virtual filesystem.
 
      alluxio fs ls /user/
 
      < you will see a "authentication failed" error >
 
-Acquire a Kerberos ticket.
+e. Acquire a Kerberos ticket.
 
      kinit
 
      < enter the user's kerberos password: it defaults to "changeme123" >
 
-Show the valid Kerberos ticket:
+f. Show the valid Kerberos ticket:
 
      klist
 
-Attempt to read the Alluxio virtual filesystem again.
+g. Attempt to read the Alluxio virtual filesystem again.
 
      alluxio fs ls /user/
 
      < you will see the contents of the /user HDFS directory >
 
-The above command shows Alluxio accessing the kerberized Hadoop environment that had the following HDFS properties configured:
+h. The above command shows Alluxio accessing the kerberized Hadoop environment that had the following HDFS properties configured:
 
       dfs.encrypt.data.transfer           = true
       dfs.encrypt.data.transfer.algorithm = 3des
@@ -191,21 +191,21 @@ The above command shows Alluxio accessing the kerberized Hadoop environment that
       hadoop.security.authorization       = true
       hadoop.security.authentication      = kerberos
 
-Copy a file to the user's home directory:
+i. Copy a file to the user's home directory:
 
      alluxio fs copyFromLocal /etc/motd /user/user1/
 
-List the files in the user's home directory (notice that the motd file is indicated as NOT_PERSISTED, and does NOT show up in the HDFS listing):
+j. List the files in the user's home directory (notice that the motd file is indicated as NOT_PERSISTED, and does NOT show up in the HDFS listing):
 
      alluxio fs ls /user/user1/
 
      hdfs dfs -ls /user/user1/
 
-Cause the file to be persisted (written to the under filesystem or HDFS):
+k. Cause the file to be persisted (written to the under filesystem or HDFS):
 
      alluxio fs persist /user/user1/
 
-See that the file has been persisted using the Alluxio command and the HDFS commands (notice that the motd file is indicated as PERSISTED, and shows up in the HDFS listing):
+l. See that the file has been persisted using the Alluxio command and the HDFS commands (notice that the motd file is indicated as PERSISTED, and shows up in the HDFS listing):
 
      alluxio fs ls /user/user1/
 
@@ -315,6 +315,8 @@ The Alluxio client jar file is in:
 ---
 
 KNOWN ISSUES:
+
+- Currently, the hdfs_storage volume is not persisting correctly, so you must remove all volumes before running "docker-compose up -d". See Step 6.a.
 
 - In Step 8.a, a "permission denied" error will result if you don't first run this command (there is an open JIRA on it):
 
