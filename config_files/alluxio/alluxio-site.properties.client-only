@@ -3,7 +3,6 @@
 
 alluxio.master.hostname=alluxio
 alluxio.security.authentication.type=KERBEROS
-alluxio.security.kerberos.unified.instance.name=alluxio.docker.com
 alluxio.security.kerberos.client.principal=hive/hadoop.docker.com@EXAMPLE.COM
 alluxio.security.kerberos.client.keytab.file=/etc/security/keytabs/hive.service.keytab
 alluxio.user.file.writetype.default=ASYNC_THROUGH
