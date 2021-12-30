@@ -189,8 +189,8 @@ sleep 5
 
 # Make some HDFS directories - add the sticky bit to /tmp and /user
 echo changeme123 | kinit
-result=$(hdfs dfs -ls /user/hive | grep warehouse)
-if [ "$result" != "" ]; then
+hdfs dfs -ls /user/hive/warehouse > /dev/null 2>&1
+if [ $? == 0 ]; then
   echo && echo " ### Skipping Create HDFS directories (they already exist)"
 else
   echo && echo " ### Creating HDFS directories (/tmp /user /user/hive etc.)"
