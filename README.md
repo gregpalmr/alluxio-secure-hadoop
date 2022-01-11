@@ -195,17 +195,7 @@ i. Copy a file to the user's home directory:
 
      alluxio fs copyFromLocal /etc/motd /user/user1/
 
-j. List the files in the user's home directory (notice that the motd file is indicated as NOT_PERSISTED, and does NOT show up in the HDFS listing):
-
-     alluxio fs ls /user/user1/
-
-     hdfs dfs -ls /user/user1/
-
-k. Cause the file to be persisted (written to the under filesystem or HDFS):
-
-     alluxio fs persist /user/user1/
-
-l. See that the file has been persisted using the Alluxio command and the HDFS commands (notice that the motd file is indicated as PERSISTED, and shows up in the HDFS listing):
+j. List the files in the user's home directory:
 
      alluxio fs ls /user/user1/
 
@@ -238,14 +228,6 @@ Create a directory in HDFS and upload the data file
 
      alluxio fs cat /user/user1/alluxio_table/alluxio_table.csv
 
-Cause Alluxio to persist the data to the under filesystem (HDFS)
-
-     alluxio fs persist /user/user1
-
-Show that the new hdfs file was persisted
-
-     hdfs dfs -ls /user/user1/alluxio_table/alluxio_table.csv
-     
 b. Test Hive with the Alluxio virtual filesystem
 
 Confirm that the user1 user has a valid kerberos ticket
