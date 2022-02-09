@@ -210,11 +210,16 @@
          <value>HOSTNAME:50470</value>
      </property>
      <property>
+         <!-- HTTPS_ONLY -->
          <name>dfs.http.policy</name>
-         <value>HTTPS_ONLY</value>
+         <value>HTTP_AND_HTTPS</value>
      </property>
      <property>
          <name>dfs.client.https.need-auth</name>
          <value>false</value>
+     </property>
+     <property>
+         <name>dfs.webhdfs.enabled</name>
+         <value>true</value>
      </property>
 </configuration>
