@@ -126,11 +126,13 @@ services:
       FQDN: alluxio.docker.com
       HADOOP_FQDN: hadoop.docker.com
       NAMENODE: hadoop.docker.com:9000
+      ALLUXIO_TARBALL: alluxio-enterprise-2.7.0-383230db95.tar.gz
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
       - "./config_files:/tmp/config_files"
       - "./bootstrap/bootstrap-alluxio.sh:/bootstrap.sh"
       - "keytabs:/etc/security/keytabs"
+      - ~/Downloads/alluxio-enterprise-2.7.0-383230db95.tar.gz:/tmp/alluxio-install/alluxio-enterprise-2.7.0-383230db95.tar.gz
     expose:
       - "19998"
       - "19999"
