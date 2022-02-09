@@ -56,7 +56,15 @@ if [ "$ALLUXIO_TARBALL" != "" ]; then
         fi
 fi
 
+# Copy Alluxio license files
+if [ -f /tmp/config_files/alluxio/alluxio-enterprise-license.json ]; then
+        cp /tmp/config_files/alluxio/alluxio-enterprise-license.json $ALLUXIO_HOME/license.json
+fi
+
 # Update the HDFS config files
+cp /tmp/config_files/hadoop/core-site.xml $HADOOP_HOME/etc/hadoop/core-site.xml
+cp /tmp/config_files/hadoop/hdfs-site.xml $HADOOP_HOME/etc/hadoop/hdfs-site.xml
+
 sed -i "s/HOSTNAME/${HADOOP_FQDN}/g" $HADOOP_HOME/etc/hadoop/core-site.xml
 sed -i "s/EXAMPLE.COM/${KRB_REALM}/g" $HADOOP_HOME/etc/hadoop/core-site.xml
 sed -i "s#/etc/security/keytabs#${KEYTAB_DIR}#g" $HADOOP_HOME/etc/hadoop/core-site.xml
@@ -65,14 +73,13 @@ sed -i "s/EXAMPLE.COM/${KRB_REALM}/g" $HADOOP_HOME/etc/hadoop/hdfs-site.xml
 sed -i "s/HOSTNAME/${HADOOP_FQDN}/g" $HADOOP_HOME/etc/hadoop/hdfs-site.xml
 sed -i "s#/etc/security/keytabs#${KEYTAB_DIR}#g" $HADOOP_HOME/etc/hadoop/hdfs-site.xml
 
+# Copy the Hadoop config files to Alluxio
+cp $HADOOP_HOME/etc/hadoop/core-site.xml $ALLUXIO_HOME/conf/core-site.xml
+cp $HADOOP_HOME/etc/hadoop/hdfs-site.xml $ALLUXIO_HOME/conf/hdfs-site.xml
+
 ## Turn on Alluxio Debug mode (uncomment these if you want to debug ssl or kerberos)
 #echo "export ALLUXIO_JAVA_OPTS=\"$ALLUXIO_JAVA_OPTS -Djavax.net.debug=ssl\"" >> $ALLUXIO_HOME/conf/alluxio-env.sh
-#echo "export ALLUXIO_JAVA_OPTS=\"$ALLUXIO_JAVA_OPTS -Dsun.security.krb5.debug=true\"" >> $ALLUXIO_HOME/conf/alluxio-env.sh
-
-# Copy Alluxio license files
-if [ -f /tmp/config_files/alluxio/alluxio-enterprise-license.json ]; then
-        cp /tmp/config_files/alluxio/alluxio-enterprise-license.json $ALLUXIO_HOME/license.json
-fi
+echo "export ALLUXIO_JAVA_OPTS=\"$ALLUXIO_JAVA_OPTS -Dsun.security.krb5.debug=true\"" >> $ALLUXIO_HOME/conf/alluxio-env.sh
 
 # Configure kerberos client
 cp -f /tmp/config_files/kdc/krb5.conf /etc/krb5.conf
