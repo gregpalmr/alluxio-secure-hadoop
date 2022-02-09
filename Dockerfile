@@ -170,13 +170,23 @@ RUN    chmod 600 /root/.ssh/config \
 #
 #    Note: MySQL jar file is in: /usr/share/java/mysql-connector-java.jar
 #    Note: After installing client, use command: mysql --host=mysql --user=root --password=changeme123
+#RUN result=`yum list installed | grep ^mysql57` \
+#    && \
+#    if [ "$result" == "" ]; then \
+#        if [ ! -f /tmp/local_files/mysql57-community-release-el7-7.noarch.rpm ]; then \
+#            curl http://repo.mysql.com/yum/mysql-5.7-community/el/7/x86_64/mysql57-community-release-el7-7.noarch.rpm \
+#                  -o /tmp/local_files/mysql57-community-release-el7-7.noarch.rpm; \
+#        fi \
+#        && rpm -ivh /tmp/local_files/mysql57-community-release-el7-7.noarch.rpm \
+#        && rm /tmp/local_files/mysql57-community-release-el7-7.noarch.rpm \
+#        && yum -y install mysql \
+#    fi
 RUN if [ ! -f /tmp/local_files/mysql57-community-release-el7-7.noarch.rpm ]; then \
-        curl http://repo.mysql.com/yum/mysql-5.7-community/el/7/x86_64/mysql57-community-release-el7-7.noarch.rpm \
-              -o /tmp/local_files/mysql57-community-release-el7-7.noarch.rpm; \
-    fi \
-    && rpm -ivh /tmp/local_files/mysql57-community-release-el7-7.noarch.rpm \
-    && rm /tmp/local_files/mysql57-community-release-el7-7.noarch.rpm \
-    && yum -y install mysql
+            curl http://repo.mysql.com/yum/mysql-5.7-community/el/7/x86_64/mysql57-community-release-el7-7.noarch.rpm \
+                  -o /tmp/local_files/mysql57-community-release-el7-7.noarch.rpm; \
+     fi \
+     && rpm -ivh /tmp/local_files/mysql57-community-release-el7-7.noarch.rpm \
+     && rm /tmp/local_files/mysql57-community-release-el7-7.noarch.rpm 
 
 # Install Hive and Hive metastore
 #
