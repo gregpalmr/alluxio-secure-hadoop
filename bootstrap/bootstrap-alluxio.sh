@@ -12,6 +12,8 @@
 # because it sets the root kerberos user's password which is needed here
 sleep 10
 
+echo 'export PS1="\u $ "' >> /etc/profile
+
 grep ALLUXIO_HOME /etc/profile
 if [ "$?" != 0 ]; then
 	echo "export ALLUXIO_HOME=/opt/alluxio" >> /etc/profile
@@ -78,7 +80,7 @@ cp $HADOOP_HOME/etc/hadoop/core-site.xml $ALLUXIO_HOME/conf/core-site.xml
 cp $HADOOP_HOME/etc/hadoop/hdfs-site.xml $ALLUXIO_HOME/conf/hdfs-site.xml
 
 ## Turn on Alluxio Debug mode (uncomment these if you want to debug ssl or kerberos)
-#echo "export ALLUXIO_JAVA_OPTS=\"$ALLUXIO_JAVA_OPTS -Djavax.net.debug=ssl\"" >> $ALLUXIO_HOME/conf/alluxio-env.sh
+echo "export ALLUXIO_JAVA_OPTS=\"$ALLUXIO_JAVA_OPTS -Djavax.net.debug=ssl\"" >> $ALLUXIO_HOME/conf/alluxio-env.sh
 echo "export ALLUXIO_JAVA_OPTS=\"$ALLUXIO_JAVA_OPTS -Dsun.security.krb5.debug=true\"" >> $ALLUXIO_HOME/conf/alluxio-env.sh
 
 # Configure kerberos client
