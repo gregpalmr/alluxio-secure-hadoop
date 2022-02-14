@@ -31,6 +31,9 @@ cp -f /tmp/config_files/kdc/krb5.conf /etc/krb5.conf
 sed -i "s/EXAMPLE.COM/${KRB_REALM}/g" /etc/krb5.conf
 sed -i "s/example.com/${DOMAIN_REALM}/g" /etc/krb5.conf
 
+# copy the Hadoop config files
+cp -f /tmp/config_files/hadoop/* $HADOOP_HOME/etc/hadoop/
+
 # update config files
 sed -i "s/HOSTNAME/${HADOOP_FQDN}/g" $HADOOP_HOME/etc/hadoop/core-site.xml
 sed -i "s/EXAMPLE.COM/${KRB_REALM}/g" $HADOOP_HOME/etc/hadoop/core-site.xml
@@ -106,6 +109,9 @@ nohup /usr/sbin/sshd -D >/dev/null 2>&1 &
 #
 # Setup Hive
 #
+
+# Copy hive config files
+cp -f /tmp/config_files/hive/* $HADOOP_HOME/etc/hive/conf/
 
 # Save a copy of the Alluxio client jar file, referenced in hive-env.sh
 CLIENT_JAR=$(ls $ALLUXIO_HOME/client/alluxio-enterprise-*-client.jar)
