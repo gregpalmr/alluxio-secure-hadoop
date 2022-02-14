@@ -210,9 +210,8 @@
          <value>HOSTNAME:50470</value>
      </property>
      <property>
-         <!-- HTTPS_ONLY -->
          <name>dfs.http.policy</name>
-         <value>HTTP_AND_HTTPS</value>
+         <value>HTTPS_ONLY</value>
      </property>
      <property>
          <name>dfs.client.https.need-auth</name>
