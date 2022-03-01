@@ -64,11 +64,12 @@ services:
       FQDN: hadoop.docker.com
       HADOOP_FQDN: hadoop.docker.com
     volumes:
-      - "./config_files:/tmp/config_files"
-      - "/etc/localtime:/etc/localtime:ro"
-      - "./bootstrap/bootstrap-hadoop.sh:/bootstrap.sh"
+      - ./config_files:/tmp/config_files
+      - /etc/localtime:/etc/localtime:ro
+      - ./bootstrap/bootstrap-hadoop.sh:/bootstrap.sh
       - hdfs_storage:/opt/hadoop/data
-      - "keytabs:/etc/security/keytabs"
+      - keytabs:/etc/security/keytabs
+      - keystore:/etc/ssl/certs
     expose:
      - 50010
      - 50020
@@ -109,27 +110,30 @@ services:
       FQDN: alluxio.docker.com
       HADOOP_FQDN: hadoop.docker.com
       NAMENODE: hadoop.docker.com:9000
-      ALLUXIO_TARBALL: alluxio-enterprise-2.7.0-383230db95.tar.gz
     volumes:
-      - "/etc/localtime:/etc/localtime:ro"
-      - "./config_files:/tmp/config_files"
-      - "./bootstrap/bootstrap-alluxio.sh:/bootstrap.sh"
-      - "keytabs:/etc/security/keytabs"
-      - ~/Downloads/alluxio-enterprise-2.7.0-383230db95.tar.gz:/tmp/alluxio-install/alluxio-enterprise-2.7.0-383230db95.tar.gz
+      - /etc/localtime:/etc/localtime:ro
+      - ./config_files:/tmp/config_files
+      - ./bootstrap/bootstrap-alluxio.sh:/bootstrap.sh
+      - keytabs:/etc/security/keytabs
+      - keystore:/etc/ssl/certs
     expose:
       - "19998"
       - "19999"
       - "29998"
       - "29999"
+      - "30000"
     ports:
       - "19999:19999"
       - "29999:29999"
+      - "30000:30000"
     command: ["/bootstrap.sh"]
 
 volumes:
   kdc_storage:
     driver: local
   keytabs:
+    driver: local
+  keystore:
     driver: local
   hdfs_storage:
     driver: local
