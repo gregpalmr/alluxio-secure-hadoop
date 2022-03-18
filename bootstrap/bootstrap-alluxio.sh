@@ -164,6 +164,7 @@ cp /tmp/config_files/alluxio/alluxio-env.sh $ALLUXIO_HOME/conf/alluxio-env.sh
 
 # Make alluxio user owner of files
 chown -R alluxio:root /opt/alluxio/
+chmod -R go+rw /opt/alluxio/logs/user
 
 # Acquire Kerberos ticket for the alluxio user
 su - alluxio bash -c "kinit -kt ${KEYTAB_DIR}/alluxio.service.keytab alluxio/$(hostname -f)@${KRB_REALM}"
