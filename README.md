@@ -27,13 +27,16 @@ Install the docker package
 
 Increase the ulimit in /etc/sysconfig/docker
 
-     sudo sed -i 's/nofile=32768:65536/nofile=1024000:1024000/' /etc/sysconfig/docker
-
+     sudo echo "nofile=1024000:1024000" >> /etc/sysconfig/docker
      sudo service docker start
 
 Add your user to the docker group
 
      sudo usermod -a -G docker ec2-user
+
+     or
+
+     sudo usermod -a -G docker centos
 
 Logout and back in to get new group membershiop
 
@@ -43,7 +46,13 @@ Logout and back in to get new group membershiop
 
 Install the docker-compose package
 
-     DOCKER_COMPOSE_VERSION="1.23.2"
+     Red Hat EL 7.x
+
+          DOCKER_COMPOSE_VERSION="1.23.2"
+
+     Red Hat EL 8.x
+
+          DOCKER_COMPOSE_VERSION="1.27.0"
 
      sudo  curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
 
@@ -83,8 +92,8 @@ The Dockerfile script is setup to copy tarballs and zip files from the local_fil
 
      mkdir -p local_files && cd local_files
 
-     curl -L "oraclelicense=a" http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.rpm -O
-     curl -L "oraclelicense=a" http://download.oracle.com/otn-pub/java/jce/8/jce_policy-8.zip -O
+     curl -v -j -k -L -H "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.rpm -O
+     curl -v -j -k -L -H "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jce/8/jce_policy-8.zip -O
      curl -L https://archive.apache.org/dist/hadoop/core/hadoop-2.10.1/hadoop-2.10.1.tar.gz -O
      curl -L https://archive.apache.org/dist/hadoop/core/hadoop-2.10.1/hadoop-2.10.1-src.tar.gz -O
      curl -L https://github.com/google/protobuf/releases/download/v2.5.0/protobuf-2.5.0.tar.gz -O
