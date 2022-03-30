@@ -140,7 +140,7 @@ c. You can see the log output of the Alluxio containers using this command:
 d. You can see the log output of the Hadoop containers using this command:
 
      docker logs -f hadoop-namenode
-     docker logs -f hadoop-datanode
+     docker logs -f hadoop-datanode1
 
 e. You can see the log output of the Kerberos kdc container using this command:
 
