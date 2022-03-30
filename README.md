@@ -261,8 +261,6 @@ As a test user, create a small test data file
 
 Create a directory in HDFS and upload the data file
 
-     alluxio fs ls -f /user/user1/  # needed to avoid permissions error
-
      alluxio fs mkdir /user/user1/alluxio_table/
 
      alluxio fs copyFromLocal alluxio_table.csv /user/user1/alluxio_table/
@@ -339,12 +337,7 @@ The Alluxio client jar file is in:
 
 KNOWN ISSUES:
 
-- Currently, the hdfs_storage volume is not persisting correctly, so you must remove all volumes before running "docker-compose up -d". See Step 6.a.
-
-- In Step 8.a, a "permission denied" error will result if you don't first run this command (there is an open JIRA on it):
-
-     alluxio fs ls -f /user/user1/  
-
+     None at this time.
 
 ---
 
