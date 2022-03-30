@@ -108,6 +108,10 @@ Then, build the docker image used for the Hadoop instances and the Alluxio insta
 
      docker build -t myalluxio/alluxio-secure-hadoop:hadoop-2.10.1 . 2>&1 | tee  ./build-log.txt
 
+or, if you want to build from scratch, without previously built image layers.
+
+     docker build --no-cache -t myalluxio/alluxio-secure-hadoop:hadoop-2.10.1 . 2>&1 | tee  ./build-log.txt
+
 Note: if you run out of Docker volume space, run this command:
 
      docker volume prune
