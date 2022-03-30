@@ -3,6 +3,7 @@
 # DESCR: Creates Alluxio Enteprise image with a pseudo distributed kerberized hadoop 2.10.1 cluster
 #
 # USAGE: docker build -t myalluxio/alluxio-secure-hadoop:hadoop-2.10.1 . 2>&1 | tee  ./build-log.txt
+#    OR: docker build --no-cache -t myalluxio/alluxio-secure-hadoop:hadoop-2.10.1 . 2>&1 | tee  ./build-log.txt
 #
 
 FROM centos:centos7
@@ -21,7 +22,7 @@ RUN echo $ROOT_PASSWORD | passwd root --stdin
 RUN yum clean all; \
     rpm --rebuilddb; \
     yum install -y curl which tar sudo openssh-server openssh-clients rsync \ 
-        net-tools vim rsyslog unzip glibc-devel initscripts mysql-connector-java \
+        net-tools vim rsyslog unzip glibc-devel initscripts mysql mysql-connector-java \
         glibc-headers gcc-c++ make cmake git zlib-devel
 
 # update libselinux. see https://github.com/sequenceiq/hadoop-docker/issues/14
@@ -42,8 +43,7 @@ COPY README.md local_files* /tmp/local_files/
 # Install Java
 ARG THIS_JAVA_HOME=/usr/java/default
 RUN if [ ! -f /tmp/local_files/jdk-8u131-linux-x64.rpm ]; then \
-       curl -L -b "oraclelicense=a" http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.rpm \
-            -o /tmp/local_files/jdk-8u131-linux-x64.rpm; \
+        curl -v -j -k -L -H "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.rpm -o /tmp/local_files/jdk-8u131-linux-x64.rpm; \
     fi \
     && rpm -i /tmp/local_files/jdk-8u131-linux-x64.rpm \
     && rm /tmp/local_files/jdk-8u131-linux-x64.rpm \
@@ -55,7 +55,7 @@ RUN if [ ! -f /tmp/local_files/jdk-8u131-linux-x64.rpm ]; then \
 
 # Install Java JCE Policy files
 RUN if [ ! -f /tmp/local_files/jce_policy-8.zip ]; then \
-        curl -L -b "oraclelicense=a" http://download.oracle.com/otn-pub/java/jce/8/jce_policy-8.zip -o /tmp/local_files/jce_policy-8.zip; \
+        curl -v -j -k -L -H "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jce/8/jce_policy-8.zip -o /tmp/local_files/jce_policy-8.zip; \
     fi \
     && unzip /tmp/local_files/jce_policy-8.zip \
     && cp /UnlimitedJCEPolicyJDK8/local_policy.jar /UnlimitedJCEPolicyJDK8/US_export_policy.jar $THIS_JAVA_HOME/jre/lib/security \
@@ -85,6 +85,7 @@ RUN export HADOOP_PREFIX=$THIS_HADOOP_PREFIX \
     && ln -s $HADOOP_HOME/etc/hadoop /etc/hadoop/conf \
     && echo "#### Hadoop Environment ####" >> /etc/profile \
     && echo "export HADOOP_HOME=$HADOOP_HOME" >> /etc/profile \
+    && echo "export HADOOP_CONF_DIR=$HADOOP_CONF_DIR" >> /etc/profile \
     && echo "export PATH=\$PATH:\$HADOOP_HOME/bin:\$HADOOP_HOME/sbin" >> /etc/profile \
     && mkdir -p $HADOOP_HOME/data/nodemanager/local-dirs \
     && mkdir -p $HADOOP_HOME/data/nodemanager/log-dirs
