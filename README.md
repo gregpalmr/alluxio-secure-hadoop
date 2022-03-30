@@ -124,6 +124,8 @@ a. Remove any existing volumes for these containers
 
      docker volume rm alluxio-secure-hadoop_kdc_storage
 
+     docker volume rm alluxio-secure-hadoop_keystore
+
      docker volume rm alluxio-secure-hadoop_keytabs
 
      docker volume rm alluxio-secure-hadoop_mysql_data
@@ -155,6 +157,8 @@ g. If you are done testing and do not intend to spin up the docker images again,
      docker volume rm alluxio-secure-hadoop_hdfs_storage
 
      docker volume rm alluxio-secure-hadoop_kdc_storage
+
+     docker volume rm alluxio-secure-hadoop_keystore
 
      docker volume rm alluxio-secure-hadoop_keytabs
 
