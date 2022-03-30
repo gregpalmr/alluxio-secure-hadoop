@@ -31,7 +31,7 @@
   </property>
   <property>
      <name>yarn.resourcemanager.principal</name>
-     <value>rm/HOSTNAME@EXAMPLE.COM</value>
+     <value>rm/HADOOP_NAMENODE_FQDN@EXAMPLE.COM</value>
   </property>
    
   <property>
@@ -41,7 +41,7 @@
    
   <property>
        <name>yarn.nodemanager.principal</name>
-       <value>nm/HOSTNAME@EXAMPLE.COM</value>
+       <value>nm/THIS_FQDN@EXAMPLE.COM</value>
   </property>
    
   <property>
@@ -66,7 +66,7 @@
    
   <property>
        <name>yarn.timeline-service.principal</name>
-       <value>yarn/HOSTNAME@EXAMPLE.COM</value>
+       <value>yarn/HADOOP_NAMENODE_FQDN@EXAMPLE.COM</value>
   </property>
    
   <property>
@@ -86,7 +86,7 @@
    
   <property>
        <name>yarn.timeline-service.http-authentication.kerberos.principal</name>
-       <value>HTTP/HOSTNAME@EXAMPLE.COM</value>
+       <value>HTTP/HADOOP_NAMENODE_FQDN@EXAMPLE.COM</value>
   </property>
    
   <property>

@@ -15,12 +15,12 @@
      
     <property>
          <name>mapreduce.jobhistory.webapp.address</name>
-         <value>HOSTNAME:19888</value>
+         <value>HADOOP_NAMENODE_FQDN:19888</value>
     </property> 
      
     <property>
          <name>mapreduce.jobhistory.webapp.https.address</name>
-         <value>HOSTNAME:19889</value>
+         <value>HADOOP_NAMENODE_FQDN:19889</value>
     </property> 
      
     <property>

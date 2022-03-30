@@ -1,7 +1,7 @@
 <configuration>
     <property>
         <name>fs.defaultFS</name>
-        <value>hdfs://HOSTNAME:9000</value>
+        <value>hdfs://HADOOP_NAMENODE_FQDN:9000</value>
     </property>
     <property>
          <name>hadoop.security.authentication</name>
@@ -18,7 +18,7 @@
         <name>hadoop.security.auth_to_local</name>
         <value>
         RULE:[1:$1@$0](alluxio.*@.*EXAMPLE.COM)s/.*/alluxio/ 
-        RULE:[1:$1@$0](alluxio-usr1.*@.*EXAMPLE.COM)s/.*/alluxio-usr1/ 
+        RULE:[1:$1@$0](user1.*@.*EXAMPLE.COM)s/.*/user1/ 
         RULE:[1:$1@$0](hive.*@.*EXAMPLE.COM)s/.*/hive/ 
         RULE:[2:$1@$0]([jt]t@.*EXAMPLE.COM)s/.*/root/
         RULE:[2:$1@$0]([nd]n@.*EXAMPLE.COM)s/.*/root/

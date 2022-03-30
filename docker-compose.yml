@@ -42,7 +42,7 @@ services:
       - "/etc/localtime:/etc/localtime:ro"
       - mysql_data:/var/lib/mysql
 
-  hadoop:
+  hadoop-namenode:
     networks:
       custom:
         ipv4_address: 172.22.0.4
@@ -50,31 +50,31 @@ services:
     depends_on: 
       - kdc
       - mysql
-    hostname: hadoop
+    hostname: hadoop-namenode
     domainname: docker.com
-    container_name: hadoop
+    container_name: hadoop-namenode
     tty: true
     extra_hosts:
       - "kdc.kerberos.com kdc:172.22.0.2"
       - "mysql.docker.com mysql:172.22.0.3"
-      - "alluxio.docker.com alluxio: 172.22.0.5"
+      - "hadoop-datanode1.docker.com hadoop-datanode1: 172.22.0.5"
+      - "alluxio-master.docker.com alluxio-master: 172.22.0.6"
+      - "alluxio-worker1.docker.com alluxio-worker1: 172.22.0.7"
     environment:
       KRB_REALM: EXAMPLE.COM
       DOMAIN_REALM: kdc.kerberos.com
-      FQDN: hadoop.docker.com
-      HADOOP_FQDN: hadoop.docker.com
+      THIS_FQDN: hadoop-namenode.docker.com
+      HADOOP_NAMENODE_FQDN: hadoop-namenode.docker.com
+      HADOOP_DATANODE1_FQDN: hadoop-datanode1.docker.com
     volumes:
       - ./config_files:/tmp/config_files
       - /etc/localtime:/etc/localtime:ro
-      - ./bootstrap/bootstrap-hadoop.sh:/bootstrap.sh
+      - ./bootstrap/bootstrap-hadoop-namenode.sh:/bootstrap.sh
       - hdfs_storage:/opt/hadoop/data
       - keytabs:/etc/security/keytabs
       - keystore:/etc/ssl/certs
     expose:
-     - 50010
-     - 50020
      - 50070
-     - 50075
      - 50090
      - 8020
      - 9000
@@ -89,43 +89,124 @@ services:
      - 8088
     command: ["/bootstrap.sh"]
 
-  alluxio:
+  hadoop-datanode1:
     networks:
       custom:
         ipv4_address: 172.22.0.5
     image: myalluxio/alluxio-secure-hadoop:hadoop-2.10.1
-    shm_size: '1gb'
-    depends_on:
+    depends_on: 
       - kdc
-    hostname: alluxio
+      - mysql
+    hostname: hadoop-datanode1
     domainname: docker.com
-    container_name: alluxio
+    container_name: hadoop-datanode1
     tty: true
     extra_hosts:
       - "kdc.kerberos.com kdc:172.22.0.2"
-      - "hadoop.docker.com hadoop:172.22.0.4"
+      - "mysql.docker.com mysql:172.22.0.3"
+      - "hadoop-namenode.docker.com hadoop-namenode: 172.22.0.4"
+      - "alluxio-master.docker.com alluxio-master: 172.22.0.6"
+      - "alluxio-worker1.docker.com alluxio-worker1: 172.22.0.7"
     environment:
       KRB_REALM: EXAMPLE.COM
       DOMAIN_REALM: kdc.kerberos.com
-      FQDN: alluxio.docker.com
-      HADOOP_FQDN: hadoop.docker.com
-      NAMENODE: hadoop.docker.com:9000
+      THIS_FQDN: hadoop-datanode1.docker.com
+      HADOOP_NAMENODE_FQDN: hadoop-namenode.docker.com
+      HADOOP_DATANODE1_FQDN: hadoop-datanode1.docker.com
+    volumes:
+      - ./config_files:/tmp/config_files
+      - /etc/localtime:/etc/localtime:ro
+      - ./bootstrap/bootstrap-hadoop-datanode.sh:/bootstrap.sh
+      - hdfs_storage:/opt/hadoop/data
+      - keytabs:/etc/security/keytabs
+      - keystore:/etc/ssl/certs
+    expose:
+     - 50010
+     - 50020
+     - 50075
+    command: ["/bootstrap.sh"]
+
+  alluxio-master:
+    networks:
+      custom:
+        ipv4_address: 172.22.0.6
+    image: myalluxio/alluxio-secure-hadoop:hadoop-2.10.1
+    depends_on:
+      - kdc
+    hostname: alluxio-master
+    domainname: docker.com
+    container_name: alluxio-master
+    tty: true
+    extra_hosts:
+      - "kdc.kerberos.com kdc: 172.22.0.2"
+      - "hadoop-namenode.docker.com hadoop-namenode: 172.22.0.4"
+      - "hadoop-datanode1.docker.com hadoop-datanode1: 172.22.0.5"
+      - "alluxio-worker1.docker.com alluxio-worker1: 172.22.0.7"
+    environment:
+      KRB_REALM: EXAMPLE.COM
+      DOMAIN_REALM: kdc.kerberos.com
+      THIS_FQDN: alluxio-master.docker.com
+      HADOOP_NAMENODE_FQDN: hadoop-namenode.docker.com
+      HADOOP_NAMENODE_URL: hadoop-namenode.docker.com:9000
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./config_files:/tmp/config_files
-      - ./bootstrap/bootstrap-alluxio.sh:/bootstrap.sh
+      - ./bootstrap/bootstrap-alluxio-master.sh:/bootstrap.sh
       - keytabs:/etc/security/keytabs
       - keystore:/etc/ssl/certs
     expose:
       - "19998"
       - "19999"
-      - "29998"
+      - "20001"
+      - "20002"
+      - "19200"
+      - "20003"
+    ports:
+      - "19998:19998"
+      - "19999:19999"
+    command: ["/bootstrap.sh"]
+
+  alluxio-worker1:
+    networks:
+      custom:
+        ipv4_address: 172.22.0.7
+    image: myalluxio/alluxio-secure-hadoop:hadoop-2.10.1
+    shm_size: '1gb'
+    depends_on:
+      - kdc
+      - alluxio-master
+    hostname: alluxio-worker1
+    domainname: docker.com
+    container_name: alluxio-worker1
+    tty: true
+    extra_hosts:
+      - "kdc.kerberos.com kdc: 172.22.0.2"
+      - "hadoop-namenode.docker.com hadoop-namenode: 172.22.0.4"
+      - "hadoop-datanode1.docker.com hadoop-datanode1: 172.22.0.5"
+      - "alluxio-master.docker.com alluxio-master: 172.22.0.6"
+    environment:
+      KRB_REALM: EXAMPLE.COM
+      DOMAIN_REALM: kdc.kerberos.com
+      THIS_FQDN: alluxio-worker1.docker.com
+      ALLUXIO_MASTER_FQDN: alluxio-master.docker.com
+      HADOOP_NAMENODE_FQDN: hadoop-namenode.docker.com
+      HADOOP_NAMENODE_URL: hadoop-namenode.docker.com:9000
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./config_files:/tmp/config_files
+      - ./bootstrap/bootstrap-alluxio-worker.sh:/bootstrap.sh
+      - keytabs:/etc/security/keytabs
+      - keystore:/etc/ssl/certs
+    expose:
       - "29999"
       - "30000"
+      - "30001"
+      - "30003"
+      - "39999"
     ports:
-      - "19999:19999"
-      - "29999:29999"
       - "30000:30000"
+      - "30003:30003"
+      - "39999:39999"
     command: ["/bootstrap.sh"]
 
 volumes:

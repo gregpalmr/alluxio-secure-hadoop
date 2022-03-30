@@ -60,7 +60,7 @@
     <property>
          <!--cluster variant -->
          <name>dfs.secondary.http.address</name>
-         <value>HOSTNAME:50090</value>
+         <value>HADOOP_NAMENODE_FQDN:50090</value>
          <description>Address of secondary namenode web server</description>
     </property>
 
@@ -130,7 +130,7 @@
 
     <property>
          <name>dfs.https.address</name>
-         <value>HOSTNAME:50470</value>
+         <value>THIS_FQDN:50470</value>
          <description>The https address where namenode binds</description>
     </property>
 
@@ -207,7 +207,7 @@
      </property>
      <property>
          <name>dfs.namenode.https-address</name>
-         <value>HOSTNAME:50470</value>
+         <value>HADOOP_NAMENODE_FQDN:50470</value>
      </property>
      <property>
          <name>dfs.http.policy</name>

@@ -20,7 +20,7 @@
 
 <property>
   <name>ssl.client.truststore.location</name>
-  <value>/etc/ssl/certs/hadoop-alluxio-truststore.jks</value>
+  <value>/etc/ssl/certs/hadoop-client-truststore.jks</value>
   <description>Truststore to be used by clients like distcp. Must be
   specified.
   </description>
