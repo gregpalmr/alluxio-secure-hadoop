@@ -108,7 +108,7 @@ Then, build the docker image used for the Hadoop instances and the Alluxio insta
 
      docker build -t myalluxio/alluxio-secure-hadoop:hadoop-2.10.1 . 2>&1 | tee  ./build-log.txt
 
-or, if you want to build from scratch, without previously built image layers.
+Or, if you want to build from scratch, without previously built image layers.
 
      docker build --no-cache -t myalluxio/alluxio-secure-hadoop:hadoop-2.10.1 . 2>&1 | tee  ./build-log.txt
 
@@ -132,13 +132,15 @@ b. Use the docker-compose command to start the kdc, mysql, hadoop and alluxio co
 
      docker-compose up -d
 
-c. You can see the log output of the Alluxio container using this command:
+c. You can see the log output of the Alluxio containers using this command:
 
-     docker logs -f alluxio
+     docker logs -f alluxio-master
+     docker logs -f alluxio-worker1
 
-d. You can see the log output of the Hadoop container using this command:
+d. You can see the log output of the Hadoop containers using this command:
 
-     docker logs -f hadoop
+     docker logs -f hadoop-namenode
+     docker logs -f hadoop-datanode
 
 e. You can see the log output of the Kerberos kdc container using this command:
 
@@ -162,7 +164,7 @@ g. If you are done testing and do not intend to spin up the docker images again,
 
 a. Open a command shell into the Alluxio container and execute the /etc/profile script.
 
-     docker exec -it alluxio bash
+     docker exec -it alluxio-master bash
 
      source /etc/profile
 
@@ -170,7 +172,7 @@ b. Become the test Alluxio user:
 
      su - user1
 
-c. Destroy any Kerberos ticket.
+c. Destroy any previous Kerberos ticket.
 
      kdestroy
 
@@ -196,17 +198,39 @@ g. Attempt to read the Alluxio virtual filesystem again.
 
      < you will see the contents of the /user HDFS directory >
 
-h. The above command shows Alluxio accessing the kerberized Hadoop environment that had the following HDFS properties configured:
+h. The above commands show how Alluxio implements client to Alluxio (or northbound) Kerberos authentication, using the Alluxio properties configured in the /opt/alluxio/conf/alluxio-site.properties file, like this:
 
-      dfs.encrypt.data.transfer           = true
-      dfs.encrypt.data.transfer.algorithm = 3des
-      dfs.http.policy set                 = HTTPS_ONLY
-      hadoop.security.authorization       = true
-      hadoop.security.authentication      = kerberos
+     # Setup client-side (northbound) Kerberos authentication
+     alluxio.security.authentication.type=KERBEROS
+     alluxio.security.authorization.permission.enabled=true
+     alluxio.security.kerberos.server.principal=alluxio/alluxio-master.docker.com@EXAMPLE.COM
+     alluxio.security.kerberos.server.keytab.file=/etc/security/keytabs/alluxio.alluxio-master.docker.com.keytab
+     alluxio.security.kerberos.auth.to.local=RULE:[1:$1@$0](alluxio.*@.*EXAMPLE.COM)s/.*/alluxio/ RULE:[1:$1@$0](A.*@EXAMPLE.COM)s/A([0-9]*)@.*/a$1/ DEFAULT
+
+The above commands also show how Alluxio accesses the Kerberos and TLS enabled Hadoop environment, that has the following HDFS properties configured in the /etc/hadoop/conf/hdfs-site.xml file:
+
+     dfs.encrypt.data.transfer           = true
+     dfs.encrypt.data.transfer.algorithm = 3des
+     dfs.http.policy set                 = HTTPS_ONLY
+     hadoop.security.authorization       = true
+     hadoop.security.authentication      = kerberos
+
+And has the following Alluxio properties setup in the /opt/alluxio/conf/alluxio-site.properties file"
+
+     # Root UFS properties
+     alluxio.master.mount.table.root.ufs=hdfs://hadoop-namenode.docker.com:9000/
+     alluxio.master.mount.table.root.option.alluxio.underfs.hdfs.configuration=/opt/hadoop/etc/hadoop/core-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml:/opt/hadoop/etc/ssl-client.xml
+     alluxio.master.mount.table.root.option.alluxio.underfs.version=2.7
+     alluxio.master.mount.table.root.option.alluxio.underfs.hdfs.remote=true
+     
+     # Root UFS Kerberos properties
+     alluxio.master.mount.table.root.option.alluxio.security.underfs.hdfs.kerberos.client.principal=alluxio@EXAMPLE.COM
+     alluxio.master.mount.table.root.option.alluxio.security.underfs.hdfs.kerberos.client.keytab.file=/etc/security/keytabs/alluxio.headless.keytab
+     alluxio.master.mount.table.root.option.alluxio.security.underfs.hdfs.impersonation.enabled=true
 
 i. Copy a file to the user's home directory:
 
-     alluxio fs copyFromLocal /etc/motd /user/user1/
+     alluxio fs copyFromLocal /etc/system-release /user/user1/
 
 j. List the files in the user's home directory:
 
@@ -220,7 +244,7 @@ a. Setup a test data file in Alluxio and HDFS
 
 As a test user, create a small test data file
 
-     docker exec -it alluxio bash
+     docker exec -it alluxio-master bash
 
      su - user1
 
@@ -249,7 +273,7 @@ Confirm that the user1 user has a valid kerberos ticket
 
 Start a hive session using beeline
 
-     beeline -u "jdbc:hive2://hadoop.docker.com:10000/default;principal=hive/_HOST@EXAMPLE.COM"
+     beeline -u "jdbc:hive2://hadoop-namenode.docker.com:10000/default;principal=hive/_HOST@EXAMPLE.COM"
 
 Create a table in Hive that points to the HDFS location
 
@@ -264,7 +288,7 @@ Create a table in Hive that points to the HDFS location
           phone STRING ) 
      ROW FORMAT DELIMITED
      FIELDS TERMINATED BY ','
-     LOCATION 'hdfs://hadoop.docker.com:9000/user/user1/alluxio_table';
+     LOCATION 'hdfs://hadoop-namenode.docker.com:9000/user/user1/alluxio_table';
 
      SELECT * FROM alluxio_table1;
 
@@ -279,7 +303,7 @@ Create a table in Hive that points to the Alluxio virtual filesystem
           phone STRING ) 
      ROW FORMAT DELIMITED
      FIELDS TERMINATED BY ','
-     LOCATION 'alluxio://alluxio.docker.com:19998/user/user1/alluxio_table';
+     LOCATION 'alluxio://alluxio-master.docker.com:19998/user/user1/alluxio_table';
 
      SELECT * FROM alluxio_table2;
 
@@ -287,7 +311,7 @@ Create a table in Hive that points to the Alluxio virtual filesystem
 
 If you have any issues, you can inspect the Hiveserver2 log file using the commands:
 
-     docker exec -it hadoop bash
+     docker exec -it hadoop-namenode bash
 
      vi /tmp/hive/hive.log
 
