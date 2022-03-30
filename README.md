@@ -219,7 +219,7 @@ The above commands also show how Alluxio accesses the Kerberos and TLS enabled H
      hadoop.security.authorization       = true
      hadoop.security.authentication      = kerberos
 
-And has the following Alluxio properties setup in the /opt/alluxio/conf/alluxio-site.properties file"
+And has the following Alluxio properties setup in the /opt/alluxio/conf/alluxio-site.properties file:
 
      # Root UFS properties
      alluxio.master.mount.table.root.ufs=hdfs://hadoop-namenode.docker.com:9000/
