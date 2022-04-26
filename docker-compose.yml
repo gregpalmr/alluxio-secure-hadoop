@@ -127,10 +127,10 @@ services:
     command: ["/bootstrap.sh"]
 
   alluxio-master:
+    image: myalluxio/alluxio-secure-hadoop:hadoop-2.10.1
     networks:
       custom:
         ipv4_address: 172.22.0.6
-    image: myalluxio/alluxio-secure-hadoop:hadoop-2.10.1
     depends_on:
       - kdc
     hostname: alluxio-master
@@ -167,10 +167,10 @@ services:
     command: ["/bootstrap.sh"]
 
   alluxio-worker1:
+    image: myalluxio/alluxio-secure-hadoop:hadoop-2.10.1
     networks:
       custom:
         ipv4_address: 172.22.0.7
-    image: myalluxio/alluxio-secure-hadoop:hadoop-2.10.1
     shm_size: '1gb'
     depends_on:
       - kdc
@@ -209,6 +209,44 @@ services:
       - "39999:39999"
     command: ["/bootstrap.sh"]
 
+  prometheus:
+    image: prom/prometheus:v2.22.2
+    container_name: prometheus
+    hostname: prometheus
+    domainname: docker.com
+    networks:
+      custom:
+        ipv4_address: 172.22.0.8
+    extra_hosts:
+      - "alluxio-master.docker.com alluxio-master: 172.22.0.6"
+      - "alluxio-worker1.docker.com alluxio-worker1: 172.22.0.7"
+    expose:
+      - 9090
+    ports:
+      - 9000:9090
+    volumes:
+      - ./config_files/prometheus:/etc/prometheus
+      - prometheus-data:/prometheus
+    command: --web.enable-lifecycle --log.level=debug --config.file=/etc/prometheus/prometheus.yaml
+
+  grafana:
+    image: grafana/grafana-oss:8.2.0
+    networks:
+      custom:
+        ipv4_address: 172.22.0.9
+    extra_hosts:
+      - "prometheus.docker.com prometheus: 172.22.0.8"
+    container_name: grafana
+    hostname: grafana
+    domainname: docker.com
+    ports:
+      - 3000:3000
+    volumes:
+      - ./config_files:/tmp/config_files
+      - ./bootstrap/bootstrap-grafana.sh:/bootstrap.sh
+    user: root
+    entrypoint: ["/bootstrap.sh"]
+
 volumes:
   kdc_storage:
     driver: local
@@ -219,4 +257,6 @@ volumes:
   hdfs_storage:
     driver: local
   mysql_data:
+    driver: local
+  prometheus-data:
     driver: local
