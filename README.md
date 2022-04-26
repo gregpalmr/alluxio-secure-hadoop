@@ -133,7 +133,7 @@ Note: if you run out of Docker volume space, run this command:
      docker volume prune
 
 <a name="start_containers"/></a>
-### &#x1F536; Start the kdc, hadoop and alluxio containers
+### &#x1F536; Start the KDC, Hadoop and Alluxio containers
 
 #### Step 1. Remove volumes
 
