@@ -34,6 +34,7 @@ Note: The default docker resources will not be adequate. You must increase them 
      - Memory: 8 GB
      - Swap:   2 GB
      - Disk Image Size: 150 GB
+
 #### LINUX:
 
 Install the docker package
@@ -132,7 +133,7 @@ Note: if you run out of Docker volume space, run this command:
      docker volume prune
 
 <a name="start_containers"/></a>
-#### Start the kdc, hadoop and alluxio containers
+### Start the kdc, hadoop and alluxio containers
 
 Step 1. Remove volumes
 
