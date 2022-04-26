@@ -34,7 +34,6 @@ Note: The default docker resources will not be adequate. You must increase them 
      - Memory: 8 GB
      - Swap:   2 GB
      - Disk Image Size: 150 GB
-
 #### LINUX:
 
 Install the docker package
