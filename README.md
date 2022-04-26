@@ -368,12 +368,24 @@ The Alluxio client jar file is in:
 <a name="use_prometheus"/></a>
 ### &#x1F536; Use Prometheus to monitor the Alluxio virtual filesystem
 
-#### Step 1. TBD
+#### Step 1. Access the Prometheus Web console
+
+The Prometheus web console is available on port number 9000. So you can use the following URL to access it:
+
+     http://localhost:9000
+
+#### Step 2. TBD
 
 <a name="use_grafana"/></a>
 ### &#x1F536; Use Grafana to monitor the Alluxio virtual filesystem
 
-#### Step 1. TBD
+#### Step 1. Access the Grafana  Web console
+
+The Grafana  web console is available on port number 3000. So you can use the following URL to access it:
+
+     http://localhost:3000
+
+#### Step 2. TBD
 
 ---
 
