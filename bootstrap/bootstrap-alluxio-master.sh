@@ -187,6 +187,11 @@ sed -i "s/EXAMPLE.COM/${KRB_REALM}/g" $ALLUXIO_HOME/conf/alluxio-site.properties
 # Configure the alluxio-env.sh file
 cp /tmp/config_files/alluxio/alluxio-env.sh $ALLUXIO_HOME/conf/alluxio-env.sh
 
+#
+# Configure the alluxio metrics.properties file
+#
+cp /tmp/config_files/alluxio/metrics.properties $ALLUXIO_HOME/conf/metrics.properties
+
 # Turn on Alluxio Debug mode (un-comment these if you want to debug ssl or kerberos)
 #echo "export ALLUXIO_JAVA_OPTS=\"$ALLUXIO_JAVA_OPTS -Djavax.net.debug=ssl\"" >> $ALLUXIO_HOME/conf/alluxio-env.sh
 #echo "export ALLUXIO_JAVA_OPTS=\"$ALLUXIO_JAVA_OPTS -Dsun.security.krb5.debug=true\"" >> $ALLUXIO_HOME/conf/alluxio-env.sh
