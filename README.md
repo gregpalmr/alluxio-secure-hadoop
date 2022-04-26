@@ -6,7 +6,7 @@ This repo contains docker compose artifacts that build and launch a small Alluxi
 - Hiveserver2 (via beeline)
 - Spark (comming soon)
 
-To support monitoring and metrics, it also deploys:
+Since Alluxio supports a Prometheus sink for metrics, it also deploys:
 
 - Prometheus server 
 - Grafana server 
