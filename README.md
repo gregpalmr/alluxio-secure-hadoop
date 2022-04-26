@@ -6,7 +6,10 @@ This repo contains docker compose artifacts that build and launch a small Alluxi
 - Hiveserver2 (via beeline)
 - Spark (comming soon)
 
-It also deploys a Prometheus server and Grafana server to monitor the Alluxio master node and cluster metrics.
+To support monitoring and metrics, it also deploys:
+
+- Prometheus server 
+- Grafana server 
 
 ### Table of Contents  
 [Setup](#setup)  
@@ -19,7 +22,7 @@ It also deploys a Prometheus server and Grafana server to monitor the Alluxio ma
 <a name="setup"/></a>
 ### Setup
 
-### Step 1. Install docker and docker-compose
+#### Step 1. Install docker and docker-compose
 
 #### MAC:
 
@@ -71,19 +74,19 @@ Install the docker-compose package
 
      sudo chmod +x /usr/local/bin/docker-compose
 
-### Step 2. Clone this repo:
+#### Step 2. Clone this repo:
 
      git clone https://github.com/gregpalmr/alluxio-secure-hadoop
 
      cd alluxio-secure-hadoop
 
-### Step 3. Copy your Alluxio Enterprise license file
+#### Step 3. Copy your Alluxio Enterprise license file
 
 If you don't already have an Alluxio Enterprise license file, contact your Alluxio salesperson at sales@alluxio.com.  Copy your license file to the alluxio staging directory:
 
      cp ~/Downloads/alluxio-enterprise-license.json config_files/alluxio/
 
-### Step 4. (Optional) Install your own Alluxio release
+#### Step 4. (Optional) Install your own Alluxio release
 
 If you want to test your own Alluxio release, instead of using the release bundled with the docker image, follow these steps:
 
@@ -99,7 +102,7 @@ c. Add an environment variable identifying the tarball file name. For example:
      environment:
        ALLUXIO_TARBALL: alluxio-enterprise-2.7.0-SNAPSHOT-bin.tar.gz 
 
-### Step 5. Build the docker image
+#### Step 5. Build the docker image
 
 The Dockerfile script is setup to copy tarballs and zip files from the local_files directory, if they exist. If they do not exist, the Dockerfile will use the curl command to download the tarballs and zip files from various locations, which takes some time. If you would like to save time while building the Docker image, you can pre-load the various tarballs with these commands:
 
