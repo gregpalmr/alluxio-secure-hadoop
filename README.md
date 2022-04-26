@@ -133,7 +133,7 @@ Note: if you run out of Docker volume space, run this command:
      docker volume prune
 
 <a name="start_containers"/></a>
-### Start the kdc, hadoop and alluxio containers
+### &#x1F536; Start the kdc, hadoop and alluxio containers
 
 #### Step 1. Remove volumes
 
@@ -192,7 +192,7 @@ If you are done testing and do not intend to spin up the docker images again, re
      docker volume rm alluxio-secure-prometheus_data
 
 <a name="use_alluxio"/></a>
-### Use Alluxio with the secure Hadoop environment 
+### &#x1F536; Use Alluxio with the secure Hadoop environment 
 
 #### Step 1. Open a command shell
 
@@ -274,7 +274,7 @@ And has the following Alluxio properties setup in the /opt/alluxio/conf/alluxio-
 
 
 <a name="use_hive"/></a>
-### Use Hive with the Alluxio virtual filesystem
+### &#x1F536; Use Hive with the Alluxio virtual filesystem
 
 #### Step 1. Setup a test data file in Alluxio and HDFS
 
@@ -366,12 +366,12 @@ The Alluxio client jar file is in:
      /opt/alluxio/client
 
 <a name="use_prometheus"/></a>
-### Use Prometheus to monitor the Alluxio virtual filesystem
+### &#x1F536; Use Prometheus to monitor the Alluxio virtual filesystem
 
 #### Step 1. TBD
 
 <a name="use_grafana"/></a>
-### Use Grafana to monitor the Alluxio virtual filesystem
+### &#x1F536; Use Grafana to monitor the Alluxio virtual filesystem
 
 #### Step 1. TBD
 
