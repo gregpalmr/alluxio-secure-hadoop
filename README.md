@@ -8,7 +8,7 @@ This repo contains docker compose artifacts that build and launch a small Alluxi
 
 It also deploys a Prometheus server and Grafana server to monitor the Alluxio master node and cluster metrics.
 
-##### Table of Contents  
+### Table of Contents  
 [Setup](#setup)  
 [Start the containers](#start_containers)  
 [Test secure access to Alluxio](#use_alluxio)  
@@ -16,8 +16,8 @@ It also deploys a Prometheus server and Grafana server to monitor the Alluxio ma
 [Use Prometheus to monitor Alluxio](#use_prometheus)  
 [Use Grafana to monitor Alluxio](#use_grafana)  
 
-<a name="setup"/>
-## Setup
+<a name="setup"/></a>
+### Setup
 
 ### Step 1. Install docker and docker-compose
 
@@ -129,8 +129,8 @@ Note: if you run out of Docker volume space, run this command:
 
      docker volume prune
 
-<a name="start_containers"/>
-### Start the kdc, hadoop and alluxio containers
+<a name="start_containers"/></a>
+#### Start the kdc, hadoop and alluxio containers
 
 Step 1. Remove volumes
 
@@ -188,7 +188,7 @@ If you are done testing and do not intend to spin up the docker images again, re
 
      docker volume rm alluxio-secure-prometheus_data
 
-<a name="use_alluxio"/>
+<a name="use_alluxio"/></a>
 ### Use Alluxio with the secure Hadoop environment 
 
 Step 1. Open a command shell
@@ -270,7 +270,7 @@ Step 8. List the files in the user's home directory:
      hdfs dfs -ls /user/user1/
 
 
-<a name="use_hive"/>
+<a name="use_hive"/></a>
 ### Use Hive with the Alluxio virtual filesystem
 
 Step 1. Setup a test data file in Alluxio and HDFS
@@ -362,12 +362,12 @@ The Alluxio client jar file is in:
 
      /opt/alluxio/client
 
-<a name="use_prometheus"/>
+<a name="use_prometheus"/></a>
 ### Use Prometheus to monitor the Alluxio virtual filesystem
 
 Step 1. TBD
 
-<a name="use_grafana"/>
+<a name="use_grafana"/></a>
 ### Use Grafana to monitor the Alluxio virtual filesystem
 
 Step 1. TBD
