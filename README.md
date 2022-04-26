@@ -20,7 +20,7 @@ To support monitoring and metrics, it also deploys:
 [Use Grafana to monitor Alluxio](#use_grafana)  
 
 <a name="setup"/></a>
-### Setup
+### &#x1F536; Setup
 
 #### Step 1. Install docker and docker-compose
 
