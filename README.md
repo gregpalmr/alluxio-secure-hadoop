@@ -1,10 +1,23 @@
 # alluxio-secure-hadoop
 Test Alluxio Enterprise with Apache Hadoop 2.10.1 in secure mode
 
-This repo contains docker compose artifacts that build and launch a small Alluxio cluster that runs against a secure Hadoop environment with Kerberos enabled and SSL connections enforced.
+This repo contains docker compose artifacts that build and launch a small Alluxio cluster that runs against a secure Hadoop environment with Kerberos enabled and SSL connections enforced. It also deploys an example of using secure client access methods including:
+- Alluxio command line interface (CLI)
+- Hiveserver2 (via beeline)
+- Spark (comming soon)
 
+It also deploys a Prometheus server and Grafana server to monitor the Alluxio master node and cluster metrics.
 
-## Usage:
+##### Table of Contents  
+[Setup](#setup)  
+[Start the containers](#start_containers)  
+[Test secure access to Alluxio](#use_alluxio)  
+[Use Hive with Alluxio](#use_hive)  
+[Use Prometheus to monitor Alluxio](#use_prometheus)  
+[Use Grafana to monitor Alluxio](#use_grafana)  
+
+<a name="setup"/>
+## Setup
 
 ### Step 1. Install docker and docker-compose
 
@@ -116,9 +129,12 @@ Note: if you run out of Docker volume space, run this command:
 
      docker volume prune
 
-### Step 6. Start the kdc, hadoop and alluxio containers
+<a name="start_containers"/>
+### Start the kdc, hadoop and alluxio containers
 
-a. Remove any existing volumes for these containers
+Step 1. Remove volumes
+
+Remove any existing volumes for these containers
 
      docker volume rm alluxio-secure-hadoop_hdfs_storage
 
@@ -130,29 +146,35 @@ a. Remove any existing volumes for these containers
 
      docker volume rm alluxio-secure-hadoop_mysql_data
 
-b. Use the docker-compose command to start the kdc, mysql, hadoop and alluxio containers.
+Step 2. Start the containers
+
+Use the docker-compose command to start the kdc, mysql, hadoop and alluxio containers.
 
      docker-compose up -d
 
-c. You can see the log output of the Alluxio containers using this command:
+Step 3. View log file output
+
+You can see the log output of the Alluxio containers using this command:
 
      docker logs -f alluxio-master
      docker logs -f alluxio-worker1
 
-d. You can see the log output of the Hadoop containers using this command:
+You can see the log output of the Hadoop containers using this command:
 
      docker logs -f hadoop-namenode
      docker logs -f hadoop-datanode1
 
-e. You can see the log output of the Kerberos kdc container using this command:
+You can see the log output of the Kerberos kdc container using this command:
 
      docker logs -f kdc
 
-f. When finished working with the containers, you can stop them with the commands:
+Step 4. Stop the containers
+
+When finished working with the containers, you can stop them with the commands:
 
      docker-compose down
 
-g. If you are done testing and do not intend to spin up the docker images again, remove the disk volumes with the commands:
+If you are done testing and do not intend to spin up the docker images again, remove the disk volumes with the commands:
 
      docker volume rm alluxio-secure-hadoop_hdfs_storage
 
@@ -164,45 +186,50 @@ g. If you are done testing and do not intend to spin up the docker images again,
 
      docker volume rm alluxio-secure-hadoop_mysql_data
 
-### Step 7. Test Alluxio access to the secure Hadoop environment 
+     docker volume rm alluxio-secure-prometheus_data
 
-a. Open a command shell into the Alluxio container and execute the /etc/profile script.
+<a name="use_alluxio"/>
+### Use Alluxio with the secure Hadoop environment 
+
+Step 1. Open a command shell
+
+Open a command shell into the Alluxio container and execute the /etc/profile script.
 
      docker exec -it alluxio-master bash
 
      source /etc/profile
 
-b. Become the test Alluxio user:
+Step 2. Become the test Alluxio user:
 
      su - user1
 
-c. Destroy any previous Kerberos ticket.
+Step 3. Destroy any previous Kerberos ticket.
 
      kdestroy
 
-d. Attempt to read the Alluxio virtual filesystem.
+Step 4. Attempt to read the Alluxio virtual filesystem.
 
      alluxio fs ls /user/
 
      < you will see a "authentication failed" error >
 
-e. Acquire a Kerberos ticket.
+Step 5. Acquire a Kerberos ticket.
 
      kinit
 
      < enter the user's kerberos password: it defaults to "changeme123" >
 
-f. Show the valid Kerberos ticket:
+Show the valid Kerberos ticket:
 
      klist
 
-g. Attempt to read the Alluxio virtual filesystem again.
+Step 6. Attempt to read the Alluxio virtual filesystem again.
 
      alluxio fs ls /user/
 
      < you will see the contents of the /user HDFS directory >
 
-h. The above commands show how Alluxio implements client to Alluxio (or northbound) Kerberos authentication, using the Alluxio properties configured in the /opt/alluxio/conf/alluxio-site.properties file, like this:
+The above commands show how Alluxio implements client to Alluxio (or northbound) Kerberos authentication, using the Alluxio properties configured in the /opt/alluxio/conf/alluxio-site.properties file, like this:
 
      # Setup client-side (northbound) Kerberos authentication
      alluxio.security.authentication.type=KERBEROS
@@ -232,19 +259,21 @@ And has the following Alluxio properties setup in the /opt/alluxio/conf/alluxio-
      alluxio.master.mount.table.root.option.alluxio.security.underfs.hdfs.kerberos.client.keytab.file=/etc/security/keytabs/alluxio.headless.keytab
      alluxio.master.mount.table.root.option.alluxio.security.underfs.hdfs.impersonation.enabled=true
 
-i. Copy a file to the user's home directory:
+Step 7. Copy a file to the user's home directory:
 
      alluxio fs copyFromLocal /etc/system-release /user/user1/
 
-j. List the files in the user's home directory:
+Step 8. List the files in the user's home directory:
 
      alluxio fs ls /user/user1/
 
      hdfs dfs -ls /user/user1/
 
-### Step 8. Test Hive access to the Alluxio virtual filesystem
 
-a. Setup a test data file in Alluxio and HDFS
+<a name="use_hive"/>
+### Use Hive with the Alluxio virtual filesystem
+
+Step 1. Setup a test data file in Alluxio and HDFS
 
 As a test user, create a small test data file
 
@@ -267,7 +296,7 @@ Create a directory in HDFS and upload the data file
 
      alluxio fs cat /user/user1/alluxio_table/alluxio_table.csv
 
-b. Test Hive with the Alluxio virtual filesystem
+Step 2. Test Hive with the Alluxio virtual filesystem
 
 Confirm that the user1 user has a valid kerberos ticket
 
@@ -333,11 +362,23 @@ The Alluxio client jar file is in:
 
      /opt/alluxio/client
 
+<a name="use_prometheus"/>
+### Use Prometheus to monitor the Alluxio virtual filesystem
+
+Step 1. TBD
+
+<a name="use_grafana"/>
+### Use Grafana to monitor the Alluxio virtual filesystem
+
+Step 1. TBD
+
 ---
 
 KNOWN ISSUES:
 
      None at this time.
+
+TODO: Add Spark access to the secure Alluxio environment
 
 ---
 

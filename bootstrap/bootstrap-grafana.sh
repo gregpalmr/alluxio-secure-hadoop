@@ -13,8 +13,8 @@ cp /tmp/config_files/grafana/provisioning_datasources_default.yaml /etc/grafana/
 cp /tmp/config_files/grafana/provisioning_datasources_datasources.yaml /etc/grafana/provisioning/datasources/datasources.yaml
 cp /tmp/config_files/grafana/provisioning_dashboards_default.yaml /etc/grafana/provisioning/dashboards/default.yaml
 mkdir -p /var/lib/grafana/alluxio_dashboards
-cp /tmp/config_files/grafana/alluxio_master_file_ops_dashboard.json /var/lib/grafana/dashboards/
 cp /tmp/config_files/grafana/alluxio_master_file_ops_dashboard.json /var/lib/grafana/alluxio_dashboards/
+cp /tmp/config_files/grafana/alluxio_monitor_dashboard.json /var/lib/grafana/alluxio_dashboards/
 chown -R grafana /usr/share/grafana/conf/provisioning/
 chown -R grafana /var/lib/grafana/dashboards/
 chown -R grafana /var/lib/grafana/alluxio_dashboards/
