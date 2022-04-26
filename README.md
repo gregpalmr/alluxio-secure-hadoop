@@ -135,7 +135,7 @@ Note: if you run out of Docker volume space, run this command:
 <a name="start_containers"/></a>
 ### Start the kdc, hadoop and alluxio containers
 
-Step 1. Remove volumes
+#### Step 1. Remove volumes
 
 Remove any existing volumes for these containers
 
@@ -149,13 +149,13 @@ Remove any existing volumes for these containers
 
      docker volume rm alluxio-secure-hadoop_mysql_data
 
-Step 2. Start the containers
+#### Step 2. Start the containers
 
 Use the docker-compose command to start the kdc, mysql, hadoop and alluxio containers.
 
      docker-compose up -d
 
-Step 3. View log file output
+#### Step 3. View log file output
 
 You can see the log output of the Alluxio containers using this command:
 
@@ -171,7 +171,7 @@ You can see the log output of the Kerberos kdc container using this command:
 
      docker logs -f kdc
 
-Step 4. Stop the containers
+#### Step 4. Stop the containers
 
 When finished working with the containers, you can stop them with the commands:
 
@@ -194,7 +194,7 @@ If you are done testing and do not intend to spin up the docker images again, re
 <a name="use_alluxio"/></a>
 ### Use Alluxio with the secure Hadoop environment 
 
-Step 1. Open a command shell
+#### Step 1. Open a command shell
 
 Open a command shell into the Alluxio container and execute the /etc/profile script.
 
@@ -202,21 +202,21 @@ Open a command shell into the Alluxio container and execute the /etc/profile scr
 
      source /etc/profile
 
-Step 2. Become the test Alluxio user:
+#### Step 2. Become the test Alluxio user:
 
      su - user1
 
-Step 3. Destroy any previous Kerberos ticket.
+#### Step 3. Destroy any previous Kerberos ticket.
 
      kdestroy
 
-Step 4. Attempt to read the Alluxio virtual filesystem.
+#### Step 4. Attempt to read the Alluxio virtual filesystem.
 
      alluxio fs ls /user/
 
      < you will see a "authentication failed" error >
 
-Step 5. Acquire a Kerberos ticket.
+#### Step 5. Acquire a Kerberos ticket.
 
      kinit
 
@@ -226,7 +226,7 @@ Show the valid Kerberos ticket:
 
      klist
 
-Step 6. Attempt to read the Alluxio virtual filesystem again.
+#### Step 6. Attempt to read the Alluxio virtual filesystem again.
 
      alluxio fs ls /user/
 
@@ -262,11 +262,11 @@ And has the following Alluxio properties setup in the /opt/alluxio/conf/alluxio-
      alluxio.master.mount.table.root.option.alluxio.security.underfs.hdfs.kerberos.client.keytab.file=/etc/security/keytabs/alluxio.headless.keytab
      alluxio.master.mount.table.root.option.alluxio.security.underfs.hdfs.impersonation.enabled=true
 
-Step 7. Copy a file to the user's home directory:
+#### Step 7. Copy a file to the user's home directory:
 
      alluxio fs copyFromLocal /etc/system-release /user/user1/
 
-Step 8. List the files in the user's home directory:
+#### Step 8. List the files in the user's home directory:
 
      alluxio fs ls /user/user1/
 
@@ -276,7 +276,7 @@ Step 8. List the files in the user's home directory:
 <a name="use_hive"/></a>
 ### Use Hive with the Alluxio virtual filesystem
 
-Step 1. Setup a test data file in Alluxio and HDFS
+#### Step 1. Setup a test data file in Alluxio and HDFS
 
 As a test user, create a small test data file
 
@@ -299,7 +299,7 @@ Create a directory in HDFS and upload the data file
 
      alluxio fs cat /user/user1/alluxio_table/alluxio_table.csv
 
-Step 2. Test Hive with the Alluxio virtual filesystem
+#### Step 2. Test Hive with the Alluxio virtual filesystem
 
 Confirm that the user1 user has a valid kerberos ticket
 
@@ -368,12 +368,12 @@ The Alluxio client jar file is in:
 <a name="use_prometheus"/></a>
 ### Use Prometheus to monitor the Alluxio virtual filesystem
 
-Step 1. TBD
+#### Step 1. TBD
 
 <a name="use_grafana"/></a>
 ### Use Grafana to monitor the Alluxio virtual filesystem
 
-Step 1. TBD
+#### Step 1. TBD
 
 ---
 
