@@ -190,6 +190,9 @@ su - alluxio bash -c "$ALLUXIO_HOME/bin/alluxio-start.sh worker"
 su - alluxio bash -c "$ALLUXIO_HOME/bin/alluxio-start.sh job_worker"
 su - alluxio bash -c "$ALLUXIO_HOME/bin/alluxio-start.sh proxy"
 
+# Start the Spark worker daemon
+su - spark bash -c "$SPARK_HOME/sbin/start-slave.sh spark://alluxio-master:7077"
+
 #
 # Wait forever
 #

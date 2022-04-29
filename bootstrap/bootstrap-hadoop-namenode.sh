@@ -350,6 +350,8 @@ else
   hdfs dfs -chmod 1777 /user/hive/warehouse
   hdfs dfs -mkdir /user/user1
   hdfs dfs -chown user1 /user/user1
+  hdfs dfs -mkdir -p /user/spark
+  hdfs dfs -chown spark:root /user/spark
 fi
 
 # Start Hive metastore and hiveserver2 (log file will be in /tmp/hive/hive.log)

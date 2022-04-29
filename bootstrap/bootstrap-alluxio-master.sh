@@ -211,6 +211,35 @@ su - alluxio bash -c "$ALLUXIO_HOME/bin/alluxio formatJournal"
 echo "- Starting Alluxio master daemons (master, job_master)"
 su - alluxio bash -c "$ALLUXIO_HOME/bin/alluxio-start.sh master"
 su - alluxio bash -c "$ALLUXIO_HOME/bin/alluxio-start.sh job_master"
+su - alluxio bash -c "$ALLUXIO_HOME/bin/alluxio-start.sh proxy"
+
+# Start the Spark master daemon
+su - spark bash -c "$SPARK_HOME/sbin/start-master.sh"
+
+# Sleep to give worker time to go online
+sleep 10
+
+# Create some directories and files, just to get some Prometheus/Grafana metrics content
+su - alluxio bash -c "alluxio fs chmod 777 /"
+su - user1 bash -c " \
+     echo changeme123 | kinit; \
+     user_dir=/user/user1; \
+     echo \" Creating 50 directories and files in /user/user1/dir_*\"; \
+     for i in {1..50}; do \
+          echo -n \"\$i \"; \
+          filename=\"file\${i}.txt\"; \
+          echo \"file\${i}_contents\" > /tmp/\$filename; \
+          alluxio fs mkdir \$user_dir/dir_\${i} > /dev/null 2>&1; \
+          alluxio fs mkdir \$user_dir/dir_\${i}b > /dev/null 2>&1; \
+          alluxio fs copyFromLocal /tmp/\$filename \$user_dir/dir_\${i}/\$filename > /dev/null 2>&1; \
+          alluxio fs copyFromLocal /tmp/\$filename \$user_dir/dir_\${i}b/\$filename > /dev/null 2>&1; \
+          alluxio fs cat \$user_dir/dir_\${i}/\$filename > /dev/null 2>&1; \
+          alluxio fs cat \$user_dir/dir_\${i}b/\$filename > /dev/null 2>&1; \
+          alluxio fs ls -R \$user_dir > /dev/null 2>&1; \
+          rm -f /tmp/\$filename > /dev/null 2>&1; \
+          alluxio fs rm -R \$user_dir/dir_\${i}b > /dev/null 2>&1; \
+     done; \
+     "
 
 #
 # Wait forever

@@ -164,6 +164,7 @@ services:
     ports:
       - "19998:19998"
       - "19999:19999"
+      - "8080:8080"
     command: ["/bootstrap.sh"]
 
   alluxio-worker1:
@@ -207,6 +208,7 @@ services:
       - "30000:30000"
       - "30003:30003"
       - "39999:39999"
+      - "8081:8081"
     command: ["/bootstrap.sh"]
 
   prometheus:
@@ -226,7 +228,7 @@ services:
       - 9000:9090
     volumes:
       - ./config_files/prometheus:/etc/prometheus
-      - prometheus-data:/prometheus
+      - prometheus_data:/prometheus
     command: --web.enable-lifecycle --log.level=debug --config.file=/etc/prometheus/prometheus.yaml
 
   grafana:
@@ -258,5 +260,5 @@ volumes:
     driver: local
   mysql_data:
     driver: local
-  prometheus-data:
+  prometheus_data:
     driver: local

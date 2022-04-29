@@ -192,13 +192,11 @@ RUN if [ ! -f /tmp/local_files/mysql57-community-release-el7-7.noarch.rpm ]; the
 # Install Hive and Hive metastore
 #
 
-# Create a Hive user
-RUN useradd -d /opt/hive --no-create-home --uid 1002 --gid root hive \
-    && echo $NON_ROOT_PASSWORD | passwd hive --stdin
-
 # Download and install the Hive binaries 
 ARG THIS_HIVE_HOME=/opt/hive
 RUN export HIVE_HOME=$THIS_HIVE_HOME && export HIVE_CONF_DIR=/etc/hive/conf \
+    && useradd -d $HIVE_HOME --no-create-home --uid 1002 --gid root hive \
+    && echo $NON_ROOT_PASSWORD | passwd hive --stdin \
     && export HIVE_VERNO="2.3.8" \
     && \
     if [ ! -f /tmp/local_files/apache-hive-${HIVE_VERNO}-bin.tar.gz ]; then \
@@ -220,6 +218,45 @@ RUN export HIVE_HOME=$THIS_HIVE_HOME && export HIVE_CONF_DIR=/etc/hive/conf \
 
 # Install the Hive conf files (hive-env.sh, hive-site.xml, hive-log4j2.propreties)
 ADD config_files/hive/* $THIS_HIVE_HOME/conf/
+
+#
+# Install Spark
+ARG THIS_SPARK_HOME=/opt/spark
+RUN echo "Installing Spark" \
+    && \
+    if true ; then \
+      export SPARK_HOME=$THIS_SPARK_HOME; \
+      export SPARK_CONF_DIR=/etc/spark/conf; \
+      useradd -d $SPARK_HOME --no-create-home --uid 1003 --gid root spark; \
+      echo $NON_ROOT_PASSWORD | passwd spark --stdin; \
+      export SPARK_VERNO="3.2.1"; \
+      if [ ! -f /tmp/local_files/spark-${SPARK_VERNO}-bin-without-hadoop.tgz ]; then \
+          curl https://archive.apache.org/dist/spark/spark-${SPARK_VERNO}/spark-${SPARK_VERNO}-bin-without-hadoop.tgz \
+               -o /tmp/local_files/spark-${SPARK_VERNO}-bin-without-hadoop.tgz; \
+      fi; \
+      tar xvzf /tmp/local_files/spark-${SPARK_VERNO}-bin-without-hadoop.tgz -C /opt/; \
+      rm -f /tmp/local_files/spark-${SPARK_VERNO}-bin-without-hadoop.tgz; \
+      ln -s /opt/spark-${SPARK_VERNO}-bin-without-hadoop $SPARK_HOME; \
+      if [ ! `grep spark /etc/profile` ]; then \
+        echo "### Spark Environment ###" >> /etc/profile; \
+        echo "export SPARK_HOME=$SPARK_HOME" >> /etc/profile; \
+        echo "export SPARK_CONF_DIR=$SPARK_CONF_DIR" >> /etc/profile; \
+        echo "export PATH=\$PATH:\$SPARK_HOME/bin:\$SPARK_HOME/sbin" >> /etc/profile; \
+      fi; \
+      source /etc/profile; \
+      mkdir -p /etc/spark; \
+      ln -s $SPARK_HOME/conf /etc/spark/conf; \
+      echo "spark.master                       spark://alluxio-master:7077" > $SPARK_CONF_DIR/spark-defaults.conf; \ 
+      echo "spark.driver.memory                512m"                       >> $SPARK_CONF_DIR/spark-defaults.conf; \
+      hadoop_classpath=$(hadoop classpath); \
+      echo "HADOOP_CONF_DIR=$HADOOP_CONF_DIR"        > /etc/spark/conf/spark-env.sh; \
+      echo "YARN_CONF_DIR=$HADOOP_CONF_DIR"         >> /etc/spark/conf/spark-env.sh; \
+      echo "JAVA_HOME=$JAVA_HOME"                   >> /etc/spark/conf/spark-env.sh; \
+      echo "SPARK_CONF_DIR=$SPARK_CONF_DIR"         >> /etc/spark/conf/spark-env.sh; \
+      echo "SPARK_DIST_CLASSPATH=$hadoop_classpath" >> /etc/spark/conf/spark-env.sh; \
+      chown -R spark:root /opt/spark-${SPARK_VERNO}-bin-without-hadoop; \
+      chown -R spark:root /etc/spark; \
+    fi
 
 #
 # Download and install the Alluxio release
