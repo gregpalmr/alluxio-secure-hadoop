@@ -344,8 +344,8 @@ else
   echo "- Creating HDFS directories (/tmp /user /user/hive etc.)"
   hdfs dfs -mkdir -p /tmp
   hdfs dfs -chmod 1777 /tmp
-  hdfs dfs -chmod 1777 /tmp/hadoop-yarn
-  hdfs dfs -chmod go+rwx /tmp/hadoop-yarn
+  hdfs dfs -mkdir -p /tmp/hadoop-yarn/staging
+  hdfs dfs -chmod -R go+rwx /tmp/hadoop-yarn
   hdfs dfs -mkdir -p /user
   hdfs dfs -chmod 1777 /user
   hdfs dfs -mkdir -p /user/hive/warehouse
