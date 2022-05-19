@@ -4,6 +4,7 @@ Test Alluxio Enterprise with Apache Hadoop 2.10.1 in secure mode
 This repo contains docker compose artifacts that build and launch a small Alluxio cluster that runs against a secure Hadoop environment with Kerberos enabled and SSL connections enforced. It also deploys an example of using secure client access methods including:
 - Alluxio command line interface (CLI)
 - Hiveserver2 (via beeline)
+- MapReduce2/YARN
 - Spark 
 
 Since Alluxio supports a Prometheus sink for metrics, it also deploys:
