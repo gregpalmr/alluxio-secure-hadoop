@@ -4,7 +4,7 @@ Test Alluxio Enterprise with Apache Hadoop 2.10.1 in secure mode
 This repo contains docker compose artifacts that build and launch a small Alluxio cluster that runs against a secure Hadoop environment with Kerberos enabled and SSL connections enforced. It also deploys an example of using secure client access methods including:
 - Alluxio command line interface (CLI)
 - Hiveserver2 (via beeline)
-- Spark (comming soon)
+- Spark 
 
 Since Alluxio supports a Prometheus sink for metrics, it also deploys:
 
@@ -16,6 +16,8 @@ Since Alluxio supports a Prometheus sink for metrics, it also deploys:
 [Start the containers](#start_containers)  
 [Test secure access to Alluxio](#use_alluxio)  
 [Use Hive with Alluxio](#use_hive)  
+[Use MapReduce2/YARN with Alluxio](#use_yarn)  
+[Use Spark with Alluxio](#use_spark)  
 [Use Prometheus to monitor Alluxio](#use_prometheus)  
 [Use Grafana to monitor Alluxio](#use_grafana)  
 
@@ -365,6 +367,106 @@ The Alluxio client jar file is in:
 
      /opt/alluxio/client
 
+<a name="use_yarn"/></a>
+### &#x1F536; Use MapReduce2/YARN with the Alluxio virtual filesystem
+
+#### Step 1. Run an example wordcount MapReduce job
+
+a. Start a shell session as the test user user1.
+
+     docker exec -it alluxio-master bash
+
+     su - user1
+
+b. Acquire a Kerberos ticket, if needed
+
+   echo changeme123 | kinit
+
+c. Launch a MapReduce2 on YARN job
+
+Launch the example wordcount mapreduce job against the CSV file created in the Hive step above.
+
+     yarn jar \
+          $HADOOP_HOME/share/hadoop/mapreduce/hadoop-mapreduce-examples-*.jar \
+          wordcount \
+          alluxio://alluxio-master:19998/user/user1/alluxio_table/alluxio_table.csv \
+          alluxio://alluxio-master:19998/user/user1/wordcount_results
+
+View the results of the word count job:
+
+     alluxio fs cat /user/user1/wordcount_results/part000
+
+<a name="use_spark"/></a>
+### &#x1F536; Use Spark with the Alluxio virtual filesystem
+
+#### Step 1. Run a Spark SQL command against a Hive table
+
+a. Start a shell session as the test user user1.
+
+     docker exec -it alluxio-master bash
+
+     su - user1
+
+b. Acquire a Kerberos ticket, if needed
+
+   echo changeme123 | kinit
+
+c. Start a spark-shell session
+
+Start the spark shell and configure the hive metastore URI.
+
+     spark-shell \
+          --conf spark.hadoop.hive.metastore.uris=thrift://hadoop-namenode:9083
+
+d. Run Spark SQL commands to see the Hive databases and tables
+
+     scala> spark.sharedState.externalCatalog.listDatabases
+            spark.sharedState.externalCatalog.listTables("alluxio_test_db")
+
+e. Run a Spark SQL command that queries the Hive table
+
+    scala>  val sqlContext = new org.apache.spark.sql.hive.HiveContext(sc)
+            val result = sqlContext.sql("FROM alluxio_test_db.alluxio_table2 SELECT *")
+            result.show()
+
+#### Step 2. Run a Spark job that reads from Alluxio directly
+
+In the previous step, Spark SQL was used to access the Hive metastore and hive data stored in HDFS via Alluxio. In this step, use Spark/Scala commands to read from the Alluxio/HDFS files without Hive.
+
+a. If needed, run substeps a, b and c from Step 1 above.
+
+b. Run a Spark/Scala command to access the CSV file in HDFS via the Alluxio filesystem
+
+Continuing as the test user from Step 1, run a spark job with the commands:
+
+     spark-shell 
+
+     scala> val df = spark.read.csv("alluxio:///user/user1/alluxio_table/alluxio_table.csv")
+            df.printSchema()
+
+c. Run a Spark/Scala command to access the CSV file from Alluxio via the Alluxio S3 API.
+
+Continuing as the test user from Step 1, run a spark job with the commands:
+
+     spark-shell 
+
+     scala> import org.apache.spark.sql.SparkSession
+
+            val sparkMaster="spark://hadoop-namenode:7077"
+            val alluxioS3Endpoint="http://alluxio-master:39999/api/v1/s3"
+
+	       val spark = SparkSession.builder().appName(" Scala Alluxio S3 Example").config("spark.serializer", "org.apache.spark.serializer.KryoSerializer").master(sparkMaster).getOrCreate()
+
+            val sc=spark.sparkContext
+            sc.hadoopConfiguration.set("fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
+            sc.hadoopConfiguration.set("fs.s3a.endpoint", alluxioS3Endpoint)
+            sc.hadoopConfiguration.set("fs.s3a.access.key", "user1")
+            sc.hadoopConfiguration.set("fs.s3a.secret.key", "[SECRET_KEY]")
+            sc.hadoopConfiguration.set("fs.s3a.path.style.access", "true")
+            sc.hadoopConfiguration.set("fs.s3a.connection.ssl.enabled","false") 
+            
+            sc.textFile("""s3a://user/user1/alluxio_table/alluxio_table.csv""").collect()
+
 <a name="use_prometheus"/></a>
 ### &#x1F536; Use Prometheus to monitor the Alluxio virtual filesystem
 
@@ -393,7 +495,6 @@ KNOWN ISSUES:
 
      None at this time.
 
-TODO: Add Spark access to the secure Alluxio environment
 
 ---
 

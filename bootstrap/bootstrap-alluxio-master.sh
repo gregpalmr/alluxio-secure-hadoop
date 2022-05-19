@@ -116,12 +116,11 @@ else
 
      cd $old_pwd
 fi
-# Update the HDFS config files
-cp /tmp/config_files/hadoop/core-site.xml $HADOOP_HOME/etc/hadoop/core-site.xml
-cp /tmp/config_files/hadoop/hdfs-site.xml $HADOOP_HOME/etc/hadoop/hdfs-site.xml
-cp /tmp/config_files/hadoop/ssl-server.xml $HADOOP_HOME/etc/hadoop/ssl-server.xml
-cp /tmp/config_files/hadoop/ssl-client.xml $HADOOP_HOME/etc/hadoop/ssl-client.xml
 
+# copy the Hadoop config files
+cp -f /tmp/config_files/hadoop/* $HADOOP_HOME/etc/hadoop/
+
+# Update config files
 sed -i "s/THIS_FQDN/${THIS_FQDN}/g" $HADOOP_HOME/etc/hadoop/core-site.xml
 sed -i "s/HADOOP_NAMENODE_FQDN/${HADOOP_NAMENODE_FQDN}/g" $HADOOP_HOME/etc/hadoop/core-site.xml
 sed -i "s/EXAMPLE.COM/${KRB_REALM}/g" $HADOOP_HOME/etc/hadoop/core-site.xml
@@ -132,11 +131,25 @@ sed -i "s/HADOOP_NAMENODE_FQDN/${HADOOP_NAMENODE_FQDN}/g" $HADOOP_HOME/etc/hadoo
 sed -i "s/EXAMPLE.COM/${KRB_REALM}/g" $HADOOP_HOME/etc/hadoop/hdfs-site.xml
 sed -i "s#/etc/security/keytabs#${KEYTAB_DIR}#g" $HADOOP_HOME/etc/hadoop/hdfs-site.xml
 
+sed -i "s/THIS_FQDN/${THIS_FQDN}/g" $HADOOP_HOME/etc/hadoop/yarn-site.xml
+sed -i "s/HADOOP_NAMENODE_FQDN/${HADOOP_NAMENODE_FQDN}/g" $HADOOP_HOME/etc/hadoop/yarn-site.xml
+sed -i "s/EXAMPLE.COM/${KRB_REALM}/g" $HADOOP_HOME/etc/hadoop/yarn-site.xml
+sed -i "s#/etc/security/keytabs#${KEYTAB_DIR}#g" $HADOOP_HOME/etc/hadoop/yarn-site.xml
+sed -i "s#/opt/hadoop/bin/container-executor#${NM_CONTAINER_EXECUTOR_PATH}#g" $HADOOP_HOME/etc/hadoop/yarn-site.xml
+
+sed -i "s/THIS_FQDN/${THIS_FQDN}/g" $HADOOP_HOME/etc/hadoop/mapred-site.xml
+sed -i "s/EXAMPLE.COM/${KRB_REALM}/g" $HADOOP_HOME/etc/hadoop/mapred-site.xml
+sed -i "s/HADOOP_NAMENODE_FQDN/${HADOOP_NAMENODE_FQDN}/g" $HADOOP_HOME/etc/hadoop/mapred-site.xml
+sed -i "s#/etc/security/keytabs#${KEYTAB_DIR}#g" $HADOOP_HOME/etc/hadoop/mapred-site.xml
+sed -i "s/ALLUXIO_MASTER_FQDN/${ALLUXIO_MASTER_FQDN}/g" $HADOOP_HOME/etc/hadoop/mapred-site.xml
+
 sed -i "s/HADOOP_NAMENODE_FQDN/${HADOOP_NAMENODE_FQDN}/g" $HADOOP_HOME/etc/hadoop/ssl-server.xml
 
 # Copy the Hadoop config files to Alluxio
 cp $HADOOP_HOME/etc/hadoop/core-site.xml $ALLUXIO_HOME/conf/core-site.xml
 cp $HADOOP_HOME/etc/hadoop/hdfs-site.xml $ALLUXIO_HOME/conf/hdfs-site.xml
+cp $HADOOP_HOME/etc/hadoop/yarn-site.xml $ALLUXIO_HOME/conf/yarn-site.xml
+cp $HADOOP_HOME/etc/hadoop/mapred-site.xml $ALLUXIO_HOME/conf/mapred-site.xml
 cp $HADOOP_HOME/etc/hadoop/ssl-server.xml $ALLUXIO_HOME/conf/ssl-server.xml
 cp $HADOOP_HOME/etc/hadoop/ssl-client.xml $ALLUXIO_HOME/conf/ssl-client.xml
 
@@ -213,33 +226,31 @@ su - alluxio bash -c "$ALLUXIO_HOME/bin/alluxio-start.sh master"
 su - alluxio bash -c "$ALLUXIO_HOME/bin/alluxio-start.sh job_master"
 su - alluxio bash -c "$ALLUXIO_HOME/bin/alluxio-start.sh proxy"
 
-# Start the Spark master daemon
-su - spark bash -c "$SPARK_HOME/sbin/start-master.sh"
-
 # Sleep to give worker time to go online
 sleep 10
 
 # Create some directories and files, just to get some Prometheus/Grafana metrics content
 su - alluxio bash -c "alluxio fs chmod 777 /"
-su - user1 bash -c " \
-     echo changeme123 | kinit; \
-     user_dir=/user/user1; \
-     echo \" Creating 50 directories and files in /user/user1/dir_*\"; \
-     for i in {1..50}; do \
-          echo -n \"\$i \"; \
-          filename=\"file\${i}.txt\"; \
-          echo \"file\${i}_contents\" > /tmp/\$filename; \
-          alluxio fs mkdir \$user_dir/dir_\${i} > /dev/null 2>&1; \
-          alluxio fs mkdir \$user_dir/dir_\${i}b > /dev/null 2>&1; \
-          alluxio fs copyFromLocal /tmp/\$filename \$user_dir/dir_\${i}/\$filename > /dev/null 2>&1; \
-          alluxio fs copyFromLocal /tmp/\$filename \$user_dir/dir_\${i}b/\$filename > /dev/null 2>&1; \
-          alluxio fs cat \$user_dir/dir_\${i}/\$filename > /dev/null 2>&1; \
-          alluxio fs cat \$user_dir/dir_\${i}b/\$filename > /dev/null 2>&1; \
-          alluxio fs ls -R \$user_dir > /dev/null 2>&1; \
-          rm -f /tmp/\$filename > /dev/null 2>&1; \
-          alluxio fs rm -R \$user_dir/dir_\${i}b > /dev/null 2>&1; \
-     done; \
-     "
+
+#su - user1 bash -c " \
+#     echo changeme123 | kinit; \
+#     user_dir=/user/user1; \
+#     echo \" Creating 50 directories and files in /user/user1/dir_*\"; \
+#     for i in {1..50}; do \
+#          echo -n \"\$i \"; \
+#          filename=\"file\${i}.txt\"; \
+#          echo \"file\${i}_contents\" > /tmp/\$filename; \
+#          alluxio fs mkdir \$user_dir/dir_\${i} > /dev/null 2>&1; \
+#          alluxio fs mkdir \$user_dir/dir_\${i}b > /dev/null 2>&1; \
+#          alluxio fs copyFromLocal /tmp/\$filename \$user_dir/dir_\${i}/\$filename > /dev/null 2>&1; \
+#          alluxio fs copyFromLocal /tmp/\$filename \$user_dir/dir_\${i}b/\$filename > /dev/null 2>&1; \
+#          alluxio fs cat \$user_dir/dir_\${i}/\$filename > /dev/null 2>&1; \
+#          alluxio fs cat \$user_dir/dir_\${i}b/\$filename > /dev/null 2>&1; \
+#          alluxio fs ls -R \$user_dir > /dev/null 2>&1; \
+#          rm -f /tmp/\$filename > /dev/null 2>&1; \
+#          alluxio fs rm -R \$user_dir/dir_\${i}b > /dev/null 2>&1; \
+#     done; \
+#     "
 
 #
 # Wait forever

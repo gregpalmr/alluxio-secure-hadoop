@@ -7,7 +7,10 @@
         <name>mapreduce.jobhistory.keytab</name>
         <value>/etc/security/keytabs/jhs.service.keytab</value>
     </property> 
-     
+    <property>
+        <name>mapreduce.job.hdfs-servers</name>
+        <value>true</value>
+    </property> 
     <property>
          <name>mapreduce.jobhistory.principal</name>
          <value>jhs/_HOST@EXAMPLE.COM</value>

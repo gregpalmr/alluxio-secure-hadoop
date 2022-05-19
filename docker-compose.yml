@@ -66,6 +66,7 @@ services:
       THIS_FQDN: hadoop-namenode.docker.com
       HADOOP_NAMENODE_FQDN: hadoop-namenode.docker.com
       HADOOP_DATANODE1_FQDN: hadoop-datanode1.docker.com
+      ALLUXIO_MASTER_FQDN: alluxio-master.docker.com
     volumes:
       - ./config_files:/tmp/config_files
       - /etc/localtime:/etc/localtime:ro
@@ -74,12 +75,9 @@ services:
       - keytabs:/etc/security/keytabs
       - keystore:/etc/ssl/certs
     expose:
-     - 50070
-     - 50090
      - 8020
      - 9000
      - 10020
-     - 19888
      - 8030
      - 8031
      - 8032
@@ -87,6 +85,13 @@ services:
      - 8040
      - 8042
      - 8088
+     - 7077
+    ports:
+      - "50470:50470"
+      - "19888:19888"
+      - "10002:10002"
+      - "8088:8088"
+      - "8080:8080"
     command: ["/bootstrap.sh"]
 
   hadoop-datanode1:
@@ -113,6 +118,7 @@ services:
       THIS_FQDN: hadoop-datanode1.docker.com
       HADOOP_NAMENODE_FQDN: hadoop-namenode.docker.com
       HADOOP_DATANODE1_FQDN: hadoop-datanode1.docker.com
+      ALLUXIO_MASTER_FQDN: alluxio-master.docker.com
     volumes:
       - ./config_files:/tmp/config_files
       - /etc/localtime:/etc/localtime:ro
@@ -124,6 +130,10 @@ services:
      - 50010
      - 50020
      - 50075
+    ports:
+      - "50075:50075"
+      - "8081:8081"
+      - "8044:8044"
     command: ["/bootstrap.sh"]
 
   alluxio-master:
@@ -164,7 +174,7 @@ services:
     ports:
       - "19998:19998"
       - "19999:19999"
-      - "8080:8080"
+      - "4040:4040"
     command: ["/bootstrap.sh"]
 
   alluxio-worker1:
@@ -208,7 +218,6 @@ services:
       - "30000:30000"
       - "30003:30003"
       - "39999:39999"
-      - "8081:8081"
     command: ["/bootstrap.sh"]
 
   prometheus:

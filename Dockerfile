@@ -34,7 +34,7 @@ RUN echo 'alias ll="ls -alF"' >> /root/.bashrc
 RUN    ssh-keygen -q -N "" -t dsa -f /etc/ssh/ssh_host_dsa_key \
     && ssh-keygen -q -N "" -t rsa -f /etc/ssh/ssh_host_rsa_key \
     && ssh-keygen -q -N "" -t rsa -f /root/.ssh/id_rsa \
-    && cp /root/.ssh/id_rsa.pub /root/.ssh/authorized_keys
+    && /bin/cp /root/.ssh/id_rsa.pub /root/.ssh/authorized_keys
 
 # Copy any local tarballs into the container (Not Required)
 RUN mkdir /tmp/local_files
@@ -58,7 +58,7 @@ RUN if [ ! -f /tmp/local_files/jce_policy-8.zip ]; then \
         curl -v -j -k -L -H "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jce/8/jce_policy-8.zip -o /tmp/local_files/jce_policy-8.zip; \
     fi \
     && unzip /tmp/local_files/jce_policy-8.zip \
-    && cp /UnlimitedJCEPolicyJDK8/local_policy.jar /UnlimitedJCEPolicyJDK8/US_export_policy.jar $THIS_JAVA_HOME/jre/lib/security \
+    && /bin/cp -f /UnlimitedJCEPolicyJDK8/local_policy.jar /UnlimitedJCEPolicyJDK8/US_export_policy.jar $THIS_JAVA_HOME/jre/lib/security \
     && rm -rf /tmp/local_files/jce_policy-8.zip UnlimitedJCEPolicyJDK8
 
 # Install Kerberos client
@@ -81,6 +81,8 @@ RUN export HADOOP_PREFIX=$THIS_HADOOP_PREFIX \
     && rm -f /tmp/local_files/hadoop-${HADOOP_VERNO}.tar.gz \
     && ln -s /opt/hadoop-${HADOOP_VERNO} $HADOOP_HOME \
     && chown root:root -R $HADOOP_HOME/ \
+    && chmod go-wx $HADOOP_HOME/bin/container-executor $HADOOP_HOME/bin/test-container-executor \
+    && chmod ugo+s $HADOOP_HOME/bin/container-executor $HADOOP_HOME/bin/test-container-executor \
     && mkdir -p /etc/hadoop \
     && ln -s $HADOOP_HOME/etc/hadoop /etc/hadoop/conf \
     && echo "#### Hadoop Environment ####" >> /etc/profile \
@@ -151,15 +153,15 @@ RUN export HADOOP_VERNO=2.10.1 \
 #    && mkdir -p $THIS_HADOOP_PREFIX/lib/native/ \
 #    && cd /tmp/hadoop-${HADOOP_VERNO}-src/hadoop-common-project/hadoop-common \
 #    && mvn compile -Pnative \
-#    && cp target/native/target/usr/local/lib/libhadoop.a $THIS_HADOOP_PREFIX/lib/native/ \
-#    && cp target/native/target/usr/local/lib/libhadoop.so.1.0.0 $THIS_HADOOP_PREFIX/lib/native/
+#    && /bin/cp target/native/target/usr/local/lib/libhadoop.a $THIS_HADOOP_PREFIX/lib/native/ \
+#    && /bin/cp target/native/target/usr/local/lib/libhadoop.so.1.0.0 $THIS_HADOOP_PREFIX/lib/native/
 
 # Build container-executor binary
 #RUN export HADOOP_VERNO=2.10.1 \
 #    && \ 
 #    && cd /tmp/hadoop-${HADOOP_VERNO}-src/hadoop-yarn-project/hadoop-yarn/hadoop-yarn-server/hadoop-yarn-server-nodemanager \
 #    && mvn compile -Pnative \
-#    && cp target/native/target/usr/local/bin/container-executor $THIS_HADOOP_PREFIX/bin/ \
+#    && /bin/cp target/native/target/usr/local/bin/container-executor $THIS_HADOOP_PREFIX/bin/ \
 #    && chmod 6050 $THIS_HADOOP_PREFIX/bin/container-executor \
 #    && rm -rf /tmp/hadoop-${HADOOP_VERNO}-src && rm rm -rf ~/.m2
 
@@ -206,7 +208,7 @@ RUN export HIVE_HOME=$THIS_HIVE_HOME && export HIVE_CONF_DIR=/etc/hive/conf \
     && tar xvzf /tmp/local_files/apache-hive-${HIVE_VERNO}-bin.tar.gz -C /opt/ \
     && rm -f /tmp/local_files/apache-hive-${HIVE_VERNO}-bin.tar.gz \
     && ln -s /opt/apache-hive-${HIVE_VERNO}-bin $HIVE_HOME \
-    && cp /usr/share/java/mysql-connector-java.jar $HIVE_HOME/lib/ \
+    && /bin/cp /usr/share/java/mysql-connector-java.jar $HIVE_HOME/lib/ \
     && chown -R hive:root $HIVE_HOME/ \
     && chmod -R g+rw $HIVE_HOME/ \
     && mkdir -p /etc/hive \
@@ -219,44 +221,6 @@ RUN export HIVE_HOME=$THIS_HIVE_HOME && export HIVE_CONF_DIR=/etc/hive/conf \
 # Install the Hive conf files (hive-env.sh, hive-site.xml, hive-log4j2.propreties)
 ADD config_files/hive/* $THIS_HIVE_HOME/conf/
 
-#
-# Install Spark
-ARG THIS_SPARK_HOME=/opt/spark
-RUN echo "Installing Spark" \
-    && \
-    if true ; then \
-      export SPARK_HOME=$THIS_SPARK_HOME; \
-      export SPARK_CONF_DIR=/etc/spark/conf; \
-      useradd -d $SPARK_HOME --no-create-home --uid 1003 --gid root spark; \
-      echo $NON_ROOT_PASSWORD | passwd spark --stdin; \
-      export SPARK_VERNO="3.2.1"; \
-      if [ ! -f /tmp/local_files/spark-${SPARK_VERNO}-bin-without-hadoop.tgz ]; then \
-          curl https://archive.apache.org/dist/spark/spark-${SPARK_VERNO}/spark-${SPARK_VERNO}-bin-without-hadoop.tgz \
-               -o /tmp/local_files/spark-${SPARK_VERNO}-bin-without-hadoop.tgz; \
-      fi; \
-      tar xvzf /tmp/local_files/spark-${SPARK_VERNO}-bin-without-hadoop.tgz -C /opt/; \
-      rm -f /tmp/local_files/spark-${SPARK_VERNO}-bin-without-hadoop.tgz; \
-      ln -s /opt/spark-${SPARK_VERNO}-bin-without-hadoop $SPARK_HOME; \
-      if [ ! `grep spark /etc/profile` ]; then \
-        echo "### Spark Environment ###" >> /etc/profile; \
-        echo "export SPARK_HOME=$SPARK_HOME" >> /etc/profile; \
-        echo "export SPARK_CONF_DIR=$SPARK_CONF_DIR" >> /etc/profile; \
-        echo "export PATH=\$PATH:\$SPARK_HOME/bin:\$SPARK_HOME/sbin" >> /etc/profile; \
-      fi; \
-      source /etc/profile; \
-      mkdir -p /etc/spark; \
-      ln -s $SPARK_HOME/conf /etc/spark/conf; \
-      echo "spark.master                       spark://alluxio-master:7077" > $SPARK_CONF_DIR/spark-defaults.conf; \ 
-      echo "spark.driver.memory                512m"                       >> $SPARK_CONF_DIR/spark-defaults.conf; \
-      hadoop_classpath=$(hadoop classpath); \
-      echo "HADOOP_CONF_DIR=$HADOOP_CONF_DIR"        > /etc/spark/conf/spark-env.sh; \
-      echo "YARN_CONF_DIR=$HADOOP_CONF_DIR"         >> /etc/spark/conf/spark-env.sh; \
-      echo "JAVA_HOME=$JAVA_HOME"                   >> /etc/spark/conf/spark-env.sh; \
-      echo "SPARK_CONF_DIR=$SPARK_CONF_DIR"         >> /etc/spark/conf/spark-env.sh; \
-      echo "SPARK_DIST_CLASSPATH=$hadoop_classpath" >> /etc/spark/conf/spark-env.sh; \
-      chown -R spark:root /opt/spark-${SPARK_VERNO}-bin-without-hadoop; \
-      chown -R spark:root /etc/spark; \
-    fi
 
 #
 # Download and install the Alluxio release
@@ -306,6 +270,54 @@ RUN sed  -i "/^[^#]*UsePAM/ s/.*/#&/"  /etc/ssh/sshd_config \
     && echo "UsePAM no" >> /etc/ssh/sshd_config \
     && echo "Port 2122" >> /etc/ssh/sshd_config
 
+#
+# Install Spark
+ARG THIS_SPARK_HOME=/opt/spark
+RUN echo "Installing Spark" \
+    && \
+    if true ; then \
+      export SPARK_HOME=$THIS_SPARK_HOME; \
+      export SPARK_CONF_DIR=/etc/spark/conf; \
+      useradd -d $SPARK_HOME --no-create-home --uid 1003 --gid root spark; \
+      echo $NON_ROOT_PASSWORD | passwd spark --stdin; \
+      export SPARK_VERNO="2.3.2"; \
+      export SPARK_HADOOP_VERNO="2.7"; \
+      if [ ! -f /tmp/local_files/spark-${SPARK_VERNO}-bin-hadoop${SPARK_HADOOP_VERNO}.tgz ]; then \
+          echo curl https://archive.apache.org/dist/spark/spark-${SPARK_VERNO}/spark-${SPARK_VERNO}-bin-hadoop${SPARK_HADOOP_VERNO}.tgz -o /tmp/local_files/spark-${SPARK_VERNO}-bin-hadoop${SPARK_HADOOP_VERNO}.tgz; \
+          curl https://archive.apache.org/dist/spark/spark-${SPARK_VERNO}/spark-${SPARK_VERNO}-bin-hadoop${SPARK_HADOOP_VERNO}.tgz -o /tmp/local_files/spark-${SPARK_VERNO}-bin-hadoop${SPARK_HADOOP_VERNO}.tgz; \
+      fi; \
+      echo tar xvzf /tmp/local_files/spark-${SPARK_VERNO}-bin-hadoop${SPARK_HADOOP_VERNO}.tgz -C /opt/; \
+      tar xvzf /tmp/local_files/spark-${SPARK_VERNO}-bin-hadoop${SPARK_HADOOP_VERNO}.tgz -C /opt/; \
+      rm -f /tmp/local_files/spark-${SPARK_VERNO}-bin-hadoop${SPARK_HADOOP_VERNO}.tgz; \
+      ln -s /opt/spark-${SPARK_VERNO}-bin-hadoop${SPARK_HADOOP_VERNO} /opt/spark; \
+      if [ ! `grep spark /etc/profile` ]; then \
+        echo "### Spark Environment ###" >> /etc/profile; \
+        echo "export SPARK_HOME=$SPARK_HOME" >> /etc/profile; \
+        echo "export SPARK_CONF_DIR=$SPARK_CONF_DIR" >> /etc/profile; \
+        echo "export PATH=\$PATH:\$SPARK_HOME/bin:\$SPARK_HOME/sbin" >> /etc/profile; \
+      fi; \
+      source /etc/profile; \
+      mkdir -p /etc/spark; \
+      ln -s $SPARK_HOME/conf /etc/spark/conf; \
+      /bin/cp $THIS_HIVE_HOME/conf/hive-site.xml $SPARK_CONF_DIR/; \
+      CLIENT_JAR=$(ls $ALLUXIO_HOME/client/alluxio-enterprise-*-client.jar); \
+      CLIENT_JAR=$(basename $CLIENT_JAR); \
+      echo "spark.master                  spark://hadoop-namenode:7077" > $SPARK_CONF_DIR/spark-defaults.conf; \ 
+      echo "spark.driver.memory           512m"                       >> $SPARK_CONF_DIR/spark-defaults.conf; \
+      echo "spark.driver.extraClassPath   /opt/alluxio/client/$CLIENT_JAR" >> $SPARK_CONF_DIR/spark-defaults.conf; \
+      echo "spark.executor.extraClassPath /opt/alluxio/client/$CLIENT_JAR" >> $SPARK_CONF_DIR/spark-defaults.conf; \
+      echo "spark.yarn.access.hadoopFileSystems=alluxio://alluxio-master:19998" >> $SPARK_CONF_DIR/spark-defaults.conf; \ 
+      hadoop_classpath=$(hadoop classpath); \
+      echo "HADOOP_CONF_DIR=$HADOOP_CONF_DIR"        > /etc/spark/conf/spark-env.sh; \
+      echo "YARN_CONF_DIR=$HADOOP_CONF_DIR"         >> /etc/spark/conf/spark-env.sh; \
+      echo "JAVA_HOME=$JAVA_HOME"                   >> /etc/spark/conf/spark-env.sh; \
+      echo "SPARK_CONF_DIR=$SPARK_CONF_DIR"         >> /etc/spark/conf/spark-env.sh; \
+      echo "SPARK_DIST_CLASSPATH=$hadoop_classpath" >> /etc/spark/conf/spark-env.sh; \
+      chown -R spark:root /opt/spark-${SPARK_VERNO}-bin-hadoop${SPARK_HADOOP_VERNO}; \
+      chown -R spark:root /etc/spark; \
+    fi
+
+# Clean up /tmp/local_files directory
 RUN rm -rf /tmp/local_files
 
 # Hdfs ports

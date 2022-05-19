@@ -30,7 +30,7 @@ if [ "$HIVE_AUX_JARS_PATH" == "" ]; then
   #export HIVE_AUX_JARS_PATH=${ALLUXIO_HOME}/client/${CLIENT_JAR},${ALLUXIO_HOME}/conf/alluxio-site.properties
   export HIVE_AUX_JARS_PATH=${ALLUXIO_HOME}/client/${CLIENT_JAR}
 else
-  #export HIVE_AUX_JARS_PATH=${HIVE_AUX_JARS_PATH}${ALLUXIO_HOME}/client/${CLIENT_JAR},${ALLUXIO_HOME}/conf/alluxio-site.properties
+  #export HIVE_AUX_JARS_PATH=${HIVE_AUX_JARS_PATH},${ALLUXIO_HOME}/client/${CLIENT_JAR},${ALLUXIO_HOME}/conf/alluxio-site.properties
   export HIVE_AUX_JARS_PATH=${HIVE_AUX_JARS_PATH},${ALLUXIO_HOME}/client/${CLIENT_JAR}
 fi
 

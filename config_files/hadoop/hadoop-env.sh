@@ -58,7 +58,7 @@ CLIENT_JAR=$(basename $CLIENT_JAR)
 if [ "$HADOOP_CLASSPATH" == "" ]; then
   export HADOOP_CLASSPATH=${ALLUXIO_HOME}/client/${CLIENT_JAR}
 else
-  export HADOOP_CLASSPATH=${HADOOP_CLASSPATH}${ALLUXIO_HOME}/client/${CLIENT_JAR}
+  export HADOOP_CLASSPATH=${HADOOP_CLASSPATH}:${ALLUXIO_HOME}/client/${CLIENT_JAR}
 fi
 
 # The maximum amount of heap to use, in MB. Default is 1000.

@@ -48,6 +48,7 @@ sed -i "s#/opt/hadoop/bin/container-executor#${NM_CONTAINER_EXECUTOR_PATH}#g" $H
 sed -i "s/HADOOP_NAMENODE_FQDN/${HADOOP_NAMENODE_FQDN}/g" $HADOOP_HOME/etc/hadoop/mapred-site.xml
 sed -i "s/EXAMPLE.COM/${KRB_REALM}/g" $HADOOP_HOME/etc/hadoop/mapred-site.xml
 sed -i "s#/etc/security/keytabs#${KEYTAB_DIR}#g" $HADOOP_HOME/etc/hadoop/mapred-site.xml
+sed -i "s/ALLUXIO_MASTER_FQDN/${ALLUXIO_MASTER_FQDN}/g" $HADOOP_HOME/etc/hadoop/mapred-site.xml
 
 sed -i "s/HADOOP_NAMENODE_FQDN/${HADOOP_NAMENODE_FQDN}/g" $HADOOP_HOME/etc/hadoop/ssl-server.xml
 
@@ -129,6 +130,9 @@ nohup $HADOOP_HOME/bin/hdfs --config $HADOOP_CONF_DIR datanode > /var/log/hadoop
 
 echo "- Starting YARN Node Manager daemon"
 nohup $HADOOP_HOME/bin/yarn --config $HADOOP_CONF_DIR nodemanager > /var/log/yarn-nodemanager.log 2>&1 &
+
+echo "- Starting Spark Worker"
+su - spark bash -c "\$SPARK_HOME/sbin/start-slave.sh spark://hadoop-namenode:7077"
 
 echo
 echo

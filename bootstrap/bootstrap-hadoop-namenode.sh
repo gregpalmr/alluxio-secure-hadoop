@@ -138,6 +138,7 @@ sed -i "s/THIS_FQDN/${THIS_FQDN}/g" $HADOOP_HOME/etc/hadoop/mapred-site.xml
 sed -i "s/EXAMPLE.COM/${KRB_REALM}/g" $HADOOP_HOME/etc/hadoop/mapred-site.xml
 sed -i "s/HADOOP_NAMENODE_FQDN/${HADOOP_NAMENODE_FQDN}/g" $HADOOP_HOME/etc/hadoop/mapred-site.xml
 sed -i "s#/etc/security/keytabs#${KEYTAB_DIR}#g" $HADOOP_HOME/etc/hadoop/mapred-site.xml
+sed -i "s/ALLUXIO_MASTER_FQDN/${ALLUXIO_MASTER_FQDN}/g" $HADOOP_HOME/etc/hadoop/mapred-site.xml
 
 sed -i "s/HADOOP_NAMENODE_FQDN/${HADOOP_NAMENODE_FQDN}/g" $HADOOP_HOME/etc/hadoop/ssl-server.xml
 
@@ -307,7 +308,7 @@ else
     --user=root --password=$NON_ROOT_PASSWORD < /tmp/mysql_commands.sql
 
   # Create the Hive metastore schema in mysql
-  su - hive -c " . /etc/profile && $HIVE_HOME/bin/schematool -dbType mysql -initSchema"
+  su - hive -c " . /etc/profile && \$HIVE_HOME/bin/schematool -dbType mysql -initSchema"
 fi
 
 rm /tmp/mysql_commands.sql
@@ -343,6 +344,8 @@ else
   echo "- Creating HDFS directories (/tmp /user /user/hive etc.)"
   hdfs dfs -mkdir -p /tmp
   hdfs dfs -chmod 1777 /tmp
+  hdfs dfs -chmod 1777 /tmp/hadoop-yarn
+  hdfs dfs -chmod go+rwx /tmp/hadoop-yarn
   hdfs dfs -mkdir -p /user
   hdfs dfs -chmod 1777 /user
   hdfs dfs -mkdir -p /user/hive/warehouse
@@ -365,6 +368,9 @@ echo "- Starting Hiveserver2"
 sleep 3
 #su - hive -c " . /etc/profile && nohup $HIVE_HOME/bin/hive --service hiveserver2  >/dev/null 2>&1 &"
 su - hive -c " . /etc/profile && nohup $HIVE_HOME/bin/hive --service hiveserver2  > ./hiveserver2-nohup.out 2>&1 &"
+
+echo "- Starting Spark Master"
+su - spark bash -c "\$SPARK_HOME/sbin/start-master.sh"
 
 echo
 echo
