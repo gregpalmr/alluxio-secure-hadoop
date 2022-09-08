@@ -22,7 +22,7 @@
 # remote nodes.
 
 # The java implementation to use.
-export JAVA_HOME=/usr/java/default
+export JAVA_HOME=$JAVA_HOME
 export HADOOP_HOME=/opt/hadoop
 
 # The jsvc implementation to use. Jsvc is required to run secure datanodes
@@ -60,6 +60,15 @@ if [ "$HADOOP_CLASSPATH" == "" ]; then
 else
   export HADOOP_CLASSPATH=${HADOOP_CLASSPATH}:${ALLUXIO_HOME}/client/${CLIENT_JAR}
 fi
+
+# Add Alluxio assembly client jar file to classpath (needed for prometheus classes)
+#CLIENT_JAR=$(ls ${ALLUXIO_HOME}/assembly/alluxio-client-enterprise-*.jar)
+#CLIENT_JAR=$(basename $CLIENT_JAR)
+#if [ "$HADOOP_CLASSPATH" == "" ]; then
+#  export HADOOP_CLASSPATH=${ALLUXIO_HOME}/assembly/${CLIENT_JAR}
+#else
+#  export HADOOP_CLASSPATH=${HADOOP_CLASSPATH}:${ALLUXIO_HOME}/assembly/${CLIENT_JAR}
+#fi
 
 # The maximum amount of heap to use, in MB. Default is 1000.
 #export HADOOP_HEAPSIZE=

@@ -1,0 +1,4 @@
+# Enable PrometheusMetricsServlet
+sink.prometheus.class=alluxio.metrics.sink.PrometheusMetricsServlet
+
+

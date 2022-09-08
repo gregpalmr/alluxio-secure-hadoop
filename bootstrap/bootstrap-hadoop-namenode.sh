@@ -245,18 +245,19 @@ fi
 # Copy hive config files
 cp -f /tmp/config_files/hive/* /opt/hive/conf/
 
-# Save a copy of the Alluxio client jar file, referenced in hive-env.sh
-CLIENT_JAR=$(ls $ALLUXIO_HOME/client/alluxio-enterprise-*-client.jar)
-CLIENT_JAR=$(basename $CLIENT_JAR)
+# Save a copy of the Alluxio client jar files, referenced in hive-env.sh
 echo
 echo "- Setting up Alluxio client environment in /etc/alluxio/alluxio-site.properties and /opt/alluxio/client/$CLIENT_JAR"
-cp $ALLUXIO_HOME/client/$CLIENT_JAR /tmp/
-cp /tmp/config_files/alluxio/alluxio-site.properties.client-only /tmp/
-rm -rf /opt/alluxio-enterprise* /opt/alluxio
-mkdir -p $ALLUXIO_HOME/client
-mv /tmp/$CLIENT_JAR $ALLUXIO_HOME/client/
-mkdir -p $ALLUXIO_HOME/conf
-mv /tmp/alluxio-site.properties.client-only $ALLUXIO_HOME/conf/alluxio-site.properties
+cp /tmp/config_files/alluxio/alluxio-site.properties.client-only $ALLUXIO_HOME/conf/alluxio-site.properties
+#CLIENT_JAR=$(ls $ALLUXIO_HOME/client/alluxio-enterprise-*-client.jar)
+#CLIENT_JAR=$(basename $CLIENT_JAR)
+#cp $ALLUXIO_HOME/client/$CLIENT_JAR /tmp/
+#cp /tmp/config_files/alluxio/alluxio-site.properties.client-only /tmp/
+#rm -rf /opt/alluxio-enterprise* /opt/alluxio
+#mkdir -p $ALLUXIO_HOME/client
+#mv /tmp/$CLIENT_JAR $ALLUXIO_HOME/client/
+#mkdir -p $ALLUXIO_HOME/conf
+#mv /tmp/alluxio-site.properties.client-only $ALLUXIO_HOME/conf/alluxio-site.properties
 
 # Remove the duplicate log4j jar file
 if [ -f $HIVE_HOME/lib/log4j-slf4j-impl-2.6.2.jar ]; then
@@ -320,9 +321,6 @@ source /etc/profile
 
 $HADOOP_HOME/etc/hadoop/hadoop-env.sh
  
-# Temporary fix for: DatanodeProtocol: this service is only accessible by dn/hadoop-namenode.docker.com@EXAMPLE.COM
-#echo "sun.security.krb5.disableReferrals=true" >> /usr/java/default/jre/lib/security/java.security
-
 echo
 echo "- Starting namenode daemon"
 nohup $HADOOP_HOME/bin/hdfs --config $HADOOP_CONF_DIR namenode > /var/log/hadoop-namenode.log 2>&1 &
