@@ -111,8 +111,6 @@ The Dockerfile script is setup to copy tarballs and zip files from the local_fil
 
      mkdir -p local_files && cd local_files
 
-     curl -v -j -k -L -H "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.rpm -O
-     curl -v -j -k -L -H "Cookie: oraclelicense=accept-securebackup-cookie" http://download.oracle.com/otn-pub/java/jce/8/jce_policy-8.zip -O
      curl -L https://archive.apache.org/dist/hadoop/core/hadoop-2.10.1/hadoop-2.10.1.tar.gz -O
      curl -L https://archive.apache.org/dist/hadoop/core/hadoop-2.10.1/hadoop-2.10.1-src.tar.gz -O
      curl -L https://github.com/google/protobuf/releases/download/v2.5.0/protobuf-2.5.0.tar.gz -O
@@ -404,7 +402,7 @@ View the results of the word count job:
 
 a. Start a shell session as the test user user1.
 
-     docker exec -it alluxio-master bash
+     docker exec -it hadoop-namenode bash
 
      su - user1
 
