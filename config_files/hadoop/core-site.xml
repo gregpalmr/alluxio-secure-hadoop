@@ -20,6 +20,7 @@
         RULE:[1:$1@$0](alluxio.*@.*EXAMPLE.COM)s/.*/alluxio/ 
         RULE:[1:$1@$0](user1.*@.*EXAMPLE.COM)s/.*/user1/ 
         RULE:[1:$1@$0](hive.*@.*EXAMPLE.COM)s/.*/hive/ 
+        RULE:[2:$1@$0](presto@.*EXAMPLE.COM)s/.*/presto/
         RULE:[2:$1@$0]([jt]t@.*EXAMPLE.COM)s/.*/root/
         RULE:[2:$1@$0]([nd]n@.*EXAMPLE.COM)s/.*/root/
         RULE:[2:$1@$0](hm@.*EXAMPLE.COM)s/.*/root/
@@ -53,7 +54,11 @@
     </property>
     <property>
         <name>hadoop.rpc.protection</name>
-        <value>privacy</value>
+        <value>authentication</value>
+        <description>Set to "authentication" from "privacy" to solve "No common protection layer between client and server", see
+          https://community.cloudera.com/t5/Support-Questions/No-common-protection-layer-between-client-and-server-while/td-p/41814
+          for details
+        </description>
     </property>
 
     <property>
@@ -71,6 +76,15 @@
     </property>
     <property>
       <name>hadoop.proxyuser.alluxio.groups</name>
+      <value>*</value>
+    </property>
+
+    <property>
+      <name>hadoop.proxyuser.presto.hosts</name>
+      <value>*</value>
+    </property>
+    <property>
+      <name>hadoop.proxyuser.presto.groups</name>
       <value>*</value>
     </property>
 

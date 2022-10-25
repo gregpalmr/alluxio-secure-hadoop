@@ -86,6 +86,7 @@ services:
      - 8042
      - 8088
      - 7077
+     - 9083
     ports:
       - "50470:50470"
       - "19888:19888"
@@ -297,6 +298,32 @@ services:
       - ./config_files:/tmp/config_files
       - ./bootstrap/bootstrap-drillbit.sh:/bootstrap.sh
     entrypoint: ["/bootstrap.sh"]
+
+  presto-server:
+    networks:
+      custom:
+        ipv4_address: 172.22.0.14
+    image: myalluxio/presto:0.276
+    container_name: presto-server
+    hostname: presto-server
+    domainname: docker.com
+    extra_hosts:
+      - "kdc.kerberos.com kdc: 172.22.0.2"
+      - "hadoop-namenode.docker.com hadoop-namenode: 172.22.0.4"
+      - "hadoop-datanode1.docker.com hadoop-datanode1: 172.22.0.5"
+      - "alluxio-master.docker.com alluxio-master: 172.22.0.6"
+      - "alluxio-worker1.docker.com alluxio-worker1: 172.22.0.7"
+    expose:
+      - 8080
+    ports:
+      - 8181:8080 # publish presto http port 8080 for web as 8181
+    volumes:
+      - "./bootstrap/bootstrap-presto.sh:/bootstrap.sh"
+      - "./config_files/presto:/opt/presto-server/etc"
+      - "./config_files/kdc/krb5.conf:/etc/krb5.conf"
+      - "keytabs:/etc/security/keytabs"
+    entrypoint: ["/bootstrap.sh"]
+
 
 volumes:
   kdc_storage:

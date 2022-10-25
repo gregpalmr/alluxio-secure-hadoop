@@ -40,14 +40,13 @@ Note: The default docker resources will not be adequate. You must increase them 
 
 #### LINUX:
 
-Install the docker package
+Disable SELinux, update /etc/selinux/config file and run following command
 
-     sudo yum -y install docker
+     sudo setenforce 0
 
-Increase the ulimit in /etc/sysconfig/docker
+Add new group "docker"
 
-     sudo echo "nofile=1024000:1024000" >> /etc/sysconfig/docker
-     sudo service docker start
+     sudo groupadd docker
 
 Add your user to the docker group
 
@@ -56,6 +55,15 @@ Add your user to the docker group
      or
 
      sudo usermod -a -G docker centos
+
+Install needed tools
+
+     sudo yum -y install docker git 
+
+Increase the ulimit in /etc/sysconfig/docker
+
+     echo "nofile=1024000:1024000" | sudo tee -a /etc/sysconfig/docker
+     sudo service docker start
 
 Logout and back in to get new group membershiop
 
@@ -128,6 +136,15 @@ Then, build the docker image used for the Hadoop instances and the Alluxio insta
 Or, if you want to build from scratch, without previously built image layers.
 
      docker build --no-cache -t myalluxio/alluxio-secure-hadoop:hadoop-2.10.1 . 2>&1 | tee  ./build-log.txt
+
+Build the docker image used for Presto.
+
+     docker build -f dockerfiles/presto/Dockerfile -t myalluxio/presto:0.276 . 2>&1 | tee ./build-log.txt
+
+Or, if you want to build from scratch, without previously built image layers.
+
+     docker build --no-cache -f dockerfiles/presto/Dockerfile -t myalluxio/presto:0.276 . 2>&1 | tee ./build-log.txt
+
 
 Note: if you run out of Docker volume space, run this command:
 
@@ -285,8 +302,7 @@ As a test user, create a small test data file
 
      su - user1
 
-     kinit
-     < enter the user's kerberos password: it defaults to "changeme123" >
+     echo changeme123 | kinit
 
      echo "1,Jane Doe,jdoe@email.com,555-1234"               > alluxio_table.csv
      echo "2,Frank Sinclair,fsinclair@email.com,555-4321"   >> alluxio_table.csv
@@ -299,6 +315,10 @@ Create a directory in HDFS and upload the data file
      alluxio fs copyFromLocal alluxio_table.csv /user/user1/alluxio_table/
 
      alluxio fs cat /user/user1/alluxio_table/alluxio_table.csv
+
+Make /user/user1 only accessible by user1 but not user2
+
+     alluxio fs chmod 750 /user/user1
 
 #### Step 2. Test Hive with the Alluxio virtual filesystem
 
@@ -498,3 +518,23 @@ KNOWN ISSUES:
 ---
 
 Please direct questions and comments to greg.palmer@alluxio.com
+
+<a name="use_presto"/></a>
+### &#x1F536; Use Presto to query the Alluxio virtual filesystem
+
+#### Locations of useful debugging logs
+* Find Presto server log in presto-server container, `tail -f /var/lib/presto/datanode.id\=presto-server/var/log/server.log`
+     * Presto server log location can be set in `${PRESTO_HOME}/etc/jvm.config`. Specify `-Dlog.output-file=${LOG_PATH}` in that config file.
+* Find alluxio master logs by running `docker logs -f alluxio-master`
+* Find alluxio worker logs by running `docker logs -f alluxio-worker1`
+* Find hadoop namenode logs by running `docker logs -f hadoop-namenode` 
+
+
+#### Step X. Delete managed table
+
+1. Use SQL to delete the managed table
+2. Check on Alluxio and HDFS that data files are deleted successfully accordingly
+
+----
+     TBA
+----
