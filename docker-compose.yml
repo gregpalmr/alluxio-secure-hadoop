@@ -298,6 +298,20 @@ services:
       - ./bootstrap/bootstrap-drillbit.sh:/bootstrap.sh
     entrypoint: ["/bootstrap.sh"]
 
+  presto-server:
+    networks:
+      custom:
+        ipv4_address: 172.22.0.14
+    image: ahanaio/prestodb-sandbox:0.276
+    hostname: presto-server
+    container_name: presto-server
+    domainname: docker.com
+    expose:
+      - 8080
+    ports:
+      - 8080:8181 # publish presto http port 8080 for web as 8181
+
+
 volumes:
   kdc_storage:
     driver: local
