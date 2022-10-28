@@ -309,7 +309,7 @@ services:
     expose:
       - 8080
     ports:
-      - 8080:8181 # publish presto http port 8080 for web as 8181
+      - 8181:8080 # publish presto http port 8080 for web as 8181
     volumes:
       - ./config_files/presto:/opt/presto-server/etc
 
