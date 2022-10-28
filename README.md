@@ -40,14 +40,13 @@ Note: The default docker resources will not be adequate. You must increase them 
 
 #### LINUX:
 
-Install the docker package
+Disable SELinux, update /etc/selinux/config file and run following command
 
-     sudo yum -y install docker
+     sudo setenforce 0
 
-Increase the ulimit in /etc/sysconfig/docker
+Add new group "docker"
 
-     sudo echo "nofile=1024000:1024000" >> /etc/sysconfig/docker
-     sudo service docker start
+     sudo groupadd docker
 
 Add your user to the docker group
 
@@ -56,6 +55,15 @@ Add your user to the docker group
      or
 
      sudo usermod -a -G docker centos
+
+Install needed tools
+
+     sudo yum -y install docker git 
+
+Increase the ulimit in /etc/sysconfig/docker
+
+     echo "nofile=1024000:1024000" | sudo tee -a /etc/sysconfig/docker
+     sudo service docker start
 
 Logout and back in to get new group membershiop
 
