@@ -19,6 +19,9 @@ KEYTAB_DIR=/etc/security/keytabs
 FQDN=hadoop.com
 PRESTO_SERVER_FQDN=presto-server.docker.com
 
+# create principal presto/prest-server.docker.com@EXAMPLE.COM and generate keytab for it
+# this principal will be used to start the presto server, which is configured in catalog/hive.properties
+#
 if [ -d ${KEYTAB_DIR} ] && [ -f ${KEYTAB_DIR}/presto.service.keytab ]; then
   echo "- File ${KEYTAB_DIR}/presto.service.keytab exists, skipping create kerberos principals step"
 else 
