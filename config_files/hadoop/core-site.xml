@@ -26,6 +26,7 @@
         RULE:[2:$1@$0](rs@.*EXAMPLE.COM)s/.*/root/
         RULE:[2:$1@$0](rm@.*EXAMPLE.COM)s/.*/root/
         RULE:[2:$1@$0](jhs@.*EXAMPLE.COM)s/.*/root/
+        RULE:[2:$1@$0](presto@.*EXAMPLE.COM)s/.*/root/
         DEFAULT
         </value>
         <description>The mapping from kerberos principal names
