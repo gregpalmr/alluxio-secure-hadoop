@@ -19,21 +19,28 @@ KEYTAB_DIR=/etc/security/keytabs
 FQDN=hadoop.com
 PRESTO_SERVER_FQDN=presto-server.docker.com
 
+if [ -d ${KEYTAB_DIR} ] && [ -f ${KEYTAB_DIR}/presto.service.keytab ]; then
+  echo "- File ${KEYTAB_DIR}/presto.service.keytab exists, skipping create kerberos principals step"
+else 
+  echo "- Creating kerberos principals for presto.service"
 
-kadmin \
--p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} \
--q "addprinc -randkey -maxrenewlife 7d +allow_renewable presto/${PRESTO_SERVER_FQDN}@${KRB_REALM}"
+  # save cwd and cd to $KEYTAB_DIR
+  pushd ${KEYTAB_DIR}
 
-kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} \
--q "xst -k presto.service.keytab presto/${HADOOP_NAMENODE_FQDN}"
+  kadmin \
+  -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} \
+  -q "addprinc -randkey -maxrenewlife 7d +allow_renewable presto/${PRESTO_SERVER_FQDN}@${KRB_REALM}"
 
-chmod 400 ${KEYTAB_DIR}/presto.service.keytab
+  kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} \
+  -q "xst -k presto.service.keytab presto/${HADOOP_NAMENODE_FQDN}"
 
+  chmod 400 ${KEYTAB_DIR}/presto.service.keytab
 
-# Wait forever
-#
-if [[ $1 == "-bash" ]]; then
-  /bin/bash
-else
-  tail -f $ALLUXIO_HOME/logs/master.log
+  # cd back to previously cwd
+  popd
 fi
+
+
+# start presto server
+#
+/bin/sh -c ./bin/launcher run

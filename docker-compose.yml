@@ -320,7 +320,7 @@ services:
       - "./config_files/kdc/krb5.conf:/etc/krb5.conf"
       - "keytabs:/etc/security/keytabs"
       - "./bootstrap/bootstrap-presto.sh:/bootstrap.sh"
-    command: ["/bootstrap.sh"]
+    entrypoint: ["/bootstrap.sh"]
 
 
 volumes:
