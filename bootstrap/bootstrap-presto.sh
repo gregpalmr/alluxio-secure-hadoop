@@ -28,3 +28,12 @@ kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} \
 -q "xst -k presto.service.keytab presto/${HADOOP_NAMENODE_FQDN}"
 
 chmod 400 ${KEYTAB_DIR}/presto.service.keytab
+
+
+# Wait forever
+#
+if [[ $1 == "-bash" ]]; then
+  /bin/bash
+else
+  tail -f $ALLUXIO_HOME/logs/master.log
+fi
