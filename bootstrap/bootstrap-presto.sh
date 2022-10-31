@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "hahahahahahahaha"
+
 # Install Kerberos client
 #
 yum install krb5-libs krb5-workstation krb5-auth-dialog -y \
@@ -24,3 +26,5 @@ kadmin \
 
 kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} \
 -q "xst -k presto.service.keytab presto/${HADOOP_NAMENODE_FQDN}"
+
+chmod 400 ${KEYTAB_DIR}/presto.service.keytab
