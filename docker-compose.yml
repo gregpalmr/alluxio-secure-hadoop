@@ -321,6 +321,8 @@ services:
       - "./config_files/kdc/krb5.conf:/etc/krb5.conf"
       - "keytabs:/etc/security/keytabs"
       - "./bootstrap/bootstrap-presto.sh:/bootstrap.sh"
+      - "./config_files/hadoop/core-site.xml:/opt/presto-server/etc/core-site.xml"
+      - "./config_files/hadoop/hdfs-site.xml:/opt/presto-server/etc/hdfs-site.xml"
     entrypoint: ["/bootstrap.sh"]
 
 
