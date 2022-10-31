@@ -318,6 +318,8 @@ services:
     volumes:
       - "./config_files/presto:/opt/presto-server/etc"
       - "./config_files/kdc/krb5.conf:/etc/krb5.conf"
+      - "./bootstrap/bootstrap-presto.sh:/bootstrap.sh"
+    command: ["/bootstrap.sh"]
 
 
 volumes:
