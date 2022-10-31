@@ -93,7 +93,6 @@ services:
       - "10002:10002"
       - "8088:8088"
       - "8080:8080"
-      - "9083:9083"
     command: ["/bootstrap.sh"]
 
   hadoop-datanode1:
