@@ -44,3 +44,10 @@ PRESTO_SERVER_FQDN=presto-server.docker.com
 # # start presto server
 # #
 # /bin/sh -c ./bin/launcher run
+
+# wait forever
+#
+while true
+do
+  sleep 300
+done
