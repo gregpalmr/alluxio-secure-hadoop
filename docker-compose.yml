@@ -303,15 +303,21 @@ services:
       custom:
         ipv4_address: 172.22.0.14
     image: ahanaio/prestodb-sandbox:0.276
-    hostname: presto-server
     container_name: presto-server
+    hostname: presto-server
     domainname: docker.com
+    extra_hosts:
+      - "kdc.kerberos.com kdc: 172.22.0.2"
+      - "hadoop-namenode.docker.com hadoop-namenode: 172.22.0.4"
+      - "hadoop-datanode1.docker.com hadoop-datanode1: 172.22.0.5"
+      - "alluxio-master.docker.com alluxio-master: 172.22.0.6"
     expose:
       - 8080
     ports:
       - 8181:8080 # publish presto http port 8080 for web as 8181
     volumes:
-      - ./config_files/presto:/opt/presto-server/etc
+      - "./config_files/presto:/opt/presto-server/etc"
+      - "./config_files/kdc/krb5.conf:/etc/krb5.conf"
 
 
 volumes:

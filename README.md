@@ -506,3 +506,15 @@ KNOWN ISSUES:
 ---
 
 Please direct questions and comments to greg.palmer@alluxio.com
+
+<a name="use_presto"/></a>
+### &#x1F536; Use Presto to query the Alluxio virtual filesystem
+
+#### Step X. Delete managed table
+
+1. Use SQL to delete the managed table
+2. Check on Alluxio and HDFS that data files are deleted successfully accordingly
+
+----
+     TBA
+----
