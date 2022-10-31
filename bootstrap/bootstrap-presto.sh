@@ -41,9 +41,9 @@ else
 fi
 
 
-# # start presto server
-# #
-# /bin/sh -c ./bin/launcher run
+# start presto server
+#
+/bin/sh -c ./bin/launcher run
 
 # wait forever
 #
