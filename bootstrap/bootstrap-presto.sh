@@ -43,7 +43,7 @@ fi
 
 # start presto server
 #
-/bin/sh -c ./bin/launcher run
+/bin/sh ./bin/launcher run
 
 # wait forever
 #
