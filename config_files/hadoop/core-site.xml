@@ -53,7 +53,7 @@
     </property>
     <property>
         <name>hadoop.rpc.protection</name>
-        <value>privacy</value>
+        <value>authentication</value>
     </property>
 
     <property>
