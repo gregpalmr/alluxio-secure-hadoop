@@ -80,6 +80,15 @@
     </property>
 
     <property>
+      <name>hadoop.proxyuser.presto.hosts</name>
+      <value>*</value>
+    </property>
+    <property>
+      <name>hadoop.proxyuser.presto.groups</name>
+      <value>*</value>
+    </property>
+
+    <property>
       <name>fs.s3a.server-side-encryption.key</name>
       <value></value>
     </property>
