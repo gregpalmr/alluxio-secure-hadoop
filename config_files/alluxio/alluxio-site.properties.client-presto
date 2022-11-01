@@ -1,0 +1,11 @@
+# FILE: alluxio-site.properties file for clients (hiveserver2)
+#
+
+alluxio.master.hostname=alluxio-master.docker.com
+alluxio.security.authentication.type=KERBEROS
+alluxio.security.kerberos.client.principal=presto/_HOST@EXAMPLE.COM
+alluxio.security.kerberos.client.keytab.file=/etc/security/keytabs/presto.service.keytab
+alluxio.user.file.writetype.default=CACHE_THROUGH
+alluxio.user.file.readtype.default=CACHE
+
+# end of file
