@@ -510,6 +510,15 @@ Please direct questions and comments to greg.palmer@alluxio.com
 <a name="use_presto"/></a>
 ### &#x1F536; Use Presto to query the Alluxio virtual filesystem
 
+#### Build the docker image used for Presto.
+
+     docker build -f dockerfiles/presto/Dockerfile -t myalluxio/presto:0.276 . 2>&1 | tee ./build-log.txt
+
+Or, if you want to build from scratch, without previously built image layers.
+
+     docker build --no-cache -f dockerfiles/presto/Dockerfile -t myalluxio/presto:0.276 . 2>&1 | tee ./build-log.txt
+
+
 #### Step X. Delete managed table
 
 1. Use SQL to delete the managed table
