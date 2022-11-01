@@ -20,13 +20,13 @@
         RULE:[1:$1@$0](alluxio.*@.*EXAMPLE.COM)s/.*/alluxio/ 
         RULE:[1:$1@$0](user1.*@.*EXAMPLE.COM)s/.*/user1/ 
         RULE:[1:$1@$0](hive.*@.*EXAMPLE.COM)s/.*/hive/ 
+        RULE:[2:$1@$0](presto@.*EXAMPLE.COM)s/.*/presto/
         RULE:[2:$1@$0]([jt]t@.*EXAMPLE.COM)s/.*/root/
         RULE:[2:$1@$0]([nd]n@.*EXAMPLE.COM)s/.*/root/
         RULE:[2:$1@$0](hm@.*EXAMPLE.COM)s/.*/root/
         RULE:[2:$1@$0](rs@.*EXAMPLE.COM)s/.*/root/
         RULE:[2:$1@$0](rm@.*EXAMPLE.COM)s/.*/root/
         RULE:[2:$1@$0](jhs@.*EXAMPLE.COM)s/.*/root/
-        RULE:[2:$1@$0](presto@.*EXAMPLE.COM)s/.*/root/
         DEFAULT
         </value>
         <description>The mapping from kerberos principal names
