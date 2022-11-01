@@ -312,6 +312,7 @@ services:
       - "hadoop-namenode.docker.com hadoop-namenode: 172.22.0.4"
       - "hadoop-datanode1.docker.com hadoop-datanode1: 172.22.0.5"
       - "alluxio-master.docker.com alluxio-master: 172.22.0.6"
+      - "alluxio-worker1.docker.com alluxio-worker1: 172.22.0.7"
     expose:
       - 8080
     ports:
