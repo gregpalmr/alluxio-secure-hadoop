@@ -179,6 +179,7 @@ else
 
      # Create a kerberos principal for the test Alluxio user
      kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -pw ${NON_ROOT_PASSWORD} user1@${KRB_REALM}"
+     kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -pw ${NON_ROOT_PASSWORD} user2@${KRB_REALM}"
 
      chown alluxio:root alluxio.headless.keytab
      chown alluxio:root alluxio.${THIS_FQDN}.keytab
