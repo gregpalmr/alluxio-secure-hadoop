@@ -80,11 +80,11 @@
     </property>
 
     <property>
-      <name>hadoop.proxyuser.presto.hosts</name>
+      <name>hadoop.proxyuser.presto/presto-server.docker.com@EXAMPLE.COM.hosts</name>
       <value>*</value>
     </property>
     <property>
-      <name>hadoop.proxyuser.presto.groups</name>
+      <name>hadoop.proxyuser.presto/presto-server.docker.com@EXAMPLE.COM.groups</name>
       <value>*</value>
     </property>
 
