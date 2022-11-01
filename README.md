@@ -302,8 +302,7 @@ As a test user, create a small test data file
 
      su - user1
 
-     kinit
-     < enter the user's kerberos password: it defaults to "changeme123" >
+     echo changeme123 | kinit
 
      echo "1,Jane Doe,jdoe@email.com,555-1234"               > alluxio_table.csv
      echo "2,Frank Sinclair,fsinclair@email.com,555-4321"   >> alluxio_table.csv
