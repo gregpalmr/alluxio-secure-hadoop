@@ -137,6 +137,15 @@ Or, if you want to build from scratch, without previously built image layers.
 
      docker build --no-cache -t myalluxio/alluxio-secure-hadoop:hadoop-2.10.1 . 2>&1 | tee  ./build-log.txt
 
+Build the docker image used for Presto.
+
+     docker build -f dockerfiles/presto/Dockerfile -t myalluxio/presto:0.276 . 2>&1 | tee ./build-log.txt
+
+Or, if you want to build from scratch, without previously built image layers.
+
+     docker build --no-cache -f dockerfiles/presto/Dockerfile -t myalluxio/presto:0.276 . 2>&1 | tee ./build-log.txt
+
+
 Note: if you run out of Docker volume space, run this command:
 
      docker volume prune
@@ -509,14 +518,6 @@ Please direct questions and comments to greg.palmer@alluxio.com
 
 <a name="use_presto"/></a>
 ### &#x1F536; Use Presto to query the Alluxio virtual filesystem
-
-#### Build the docker image used for Presto.
-
-     docker build -f dockerfiles/presto/Dockerfile -t myalluxio/presto:0.276 . 2>&1 | tee ./build-log.txt
-
-Or, if you want to build from scratch, without previously built image layers.
-
-     docker build --no-cache -f dockerfiles/presto/Dockerfile -t myalluxio/presto:0.276 . 2>&1 | tee ./build-log.txt
 
 
 #### Step X. Delete managed table

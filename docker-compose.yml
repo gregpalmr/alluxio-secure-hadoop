@@ -303,7 +303,7 @@ services:
     networks:
       custom:
         ipv4_address: 172.22.0.14
-    image: ahanaio/prestodb-sandbox:0.276
+    image: myalluxio/presto
     container_name: presto-server
     hostname: presto-server
     domainname: docker.com
