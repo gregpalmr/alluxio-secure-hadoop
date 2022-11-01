@@ -55,6 +55,10 @@
     <property>
         <name>hadoop.rpc.protection</name>
         <value>authentication</value>
+        <description>Set to "authentication" from "privacy" to solve "No common protection layer between client and server", see
+          https://community.cloudera.com/t5/Support-Questions/No-common-protection-layer-between-client-and-server-while/td-p/41814
+          for details
+        </description>
     </property>
 
     <property>
