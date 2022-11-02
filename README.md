@@ -316,6 +316,10 @@ Create a directory in HDFS and upload the data file
 
      alluxio fs cat /user/user1/alluxio_table/alluxio_table.csv
 
+Make /user/user1 only accessible by user1 but not user2
+
+     alluxio fs chmod 750 /user/user1
+
 #### Step 2. Test Hive with the Alluxio virtual filesystem
 
 Confirm that the user1 user has a valid kerberos ticket
