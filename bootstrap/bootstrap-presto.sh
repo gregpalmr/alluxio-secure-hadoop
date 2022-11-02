@@ -1,7 +1,5 @@
 #!/bin/bash
 
-echo "hahahahahahahaha"
-
 # Install Kerberos client
 #
 yum install krb5-libs krb5-workstation krb5-auth-dialog -y \
@@ -11,12 +9,10 @@ yum install krb5-libs krb5-workstation krb5-auth-dialog -y \
 # Define Kerberos settings
 #
 KRB_REALM=EXAMPLE.COM
-DOMAIN_REALM=example.com
 KERBEROS_ADMIN=admin/admin
 KERBEROS_ADMIN_PASSWORD=admin
 KERBEROS_ROOT_USER_PASSWORD=changeme123
 KEYTAB_DIR=/etc/security/keytabs
-FQDN=hadoop.com
 PRESTO_SERVER_FQDN=presto-server.docker.com
 
 if [ -d ${KEYTAB_DIR} ] && [ -f ${KEYTAB_DIR}/presto.service.keytab ]; then
