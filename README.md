@@ -518,6 +518,13 @@ Please direct questions and comments to greg.palmer@alluxio.com
 <a name="use_presto"/></a>
 ### &#x1F536; Use Presto to query the Alluxio virtual filesystem
 
+#### Locations of useful debugging logs
+* Find Presto server log in presto-server container, `tail -f /var/lib/presto/datanode.id\=presto-server/var/log/server.log`
+     * Presto server log location can be set in `${PRESTO_HOME}/etc/jvm.config`. Specify `-Dlog.output-file=${LOG_PATH}` in that config file.
+* Find alluxio master logs by running `docker logs -f alluxio-master`
+* Find alluxio worker logs by running `docker logs -f alluxio-worker1`
+* Find hadoop namenode logs by running `docker logs -f hadoop-namenode` 
+
 
 #### Step X. Delete managed table
 
