@@ -332,7 +332,7 @@ services:
     domainname: docker.com
     networks:
       custom:
-        ipv4_address: 172.23.0.15
+        ipv4_address: 172.22.0.15
     volumes:
       - db_data:/var/lib/mysql
     restart: always
@@ -351,7 +351,7 @@ services:
     domainname: docker.com
     networks:
       custom:
-        ipv4_address: 172.23.0.16
+        ipv4_address: 172.22.0.16
     environment:
       JAVA_OPTS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/ranger/ranger-admin-truststore.jks -Djavax.net.ssl.trustStorePassword=changeme123
     depends_on:
