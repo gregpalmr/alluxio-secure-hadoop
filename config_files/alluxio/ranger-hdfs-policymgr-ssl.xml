@@ -33,14 +33,14 @@
 	</property>
 	<property>
 		<name>xasecure.policymgr.clientssl.keystore.credential.file</name>
-		<value>jceks://file/etc/ssl/certs/ranger/rangeradmin.jceks</value>
+		<value>jceks://file/etc/ssl/certs/ranger/alluxio-plugin.jceks</value>
 		<description>
 			java  keystore credential file
 		</description>
 	</property>
 	<property>
 		<name>xasecure.policymgr.clientssl.truststore.credential.file</name>
-		<value>jceks://file/etc/ssl/certs/ranger/rangeradmin.jceks</value>
+		<value>jceks://file/etc/ssl/certs/ranger/alluxio-plugin.jceks</value>
 		<description>
 			java  truststore credential file
 		</description>
