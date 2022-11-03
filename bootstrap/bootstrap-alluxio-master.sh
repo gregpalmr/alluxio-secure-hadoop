@@ -114,6 +114,10 @@ else
      #echo "- Contents of truststore file: $keys_dir/alluxio-tls-client-truststore.jks"
      #keytool -list -v -keystore alluxio-tls-client-truststore.jks -storepass $store_password
 
+    # update the owner of following file, which is created by ranger's
+    # "...credentialapi.buildks create sslTrustStore..." tool
+    chown alluxio /etc/ssl/certs/ranger/alluxio-plugin.jceks
+
      cd $old_pwd
 fi
 

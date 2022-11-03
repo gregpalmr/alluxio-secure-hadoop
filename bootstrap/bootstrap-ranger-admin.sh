@@ -44,6 +44,14 @@ if [ ! -f /etc/ssl/certs/ranger/rangeradmin.jceks ]; then
      java -cp "/opt/ranger_admin/cred/lib/*" \
        org.apache.ranger.credentialapi.buildks create sslTrustStore -value 'changeme123' \
        -provider jceks://file/etc/ssl/certs/ranger/rangeradmin.jceks
+
+    java -cp "/opt/ranger_admin/cred/lib/*" \
+       org.apache.ranger.credentialapi.buildks create sslKeyStore -value 'changeme123' \
+       -provider jceks://file/etc/ssl/certs/ranger/alluxio-plugin.jceks
+     
+     java -cp "/opt/ranger_admin/cred/lib/*" \
+       org.apache.ranger.credentialapi.buildks create sslTrustStore -value 'changeme123' \
+       -provider jceks://file/etc/ssl/certs/ranger/alluxio-plugin.jceks
 fi
 
 # For Ranger configuraiton in kerberized environment, see
