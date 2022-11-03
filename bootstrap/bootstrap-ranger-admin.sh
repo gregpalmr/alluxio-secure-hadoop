@@ -45,7 +45,49 @@ if [ ! -f /etc/ssl/certs/ranger/rangeradmin.jceks ]; then
        org.apache.ranger.credentialapi.buildks create sslTrustStore -value 'changeme123' \
        -provider jceks://file/etc/ssl/certs/ranger/rangeradmin.jceks
 fi
+
+# For Ranger configuraiton in kerberized environment, see
+# https://cwiki.apache.org/confluence/display/RANGER/Ranger+installation+in+Kerberized++Environment
+# for details
+
+# Install Kerberos client
+#
+yum install krb5-libs krb5-workstation krb5-auth-dialog -y \
+    && mkdir -p /var/log/kerberos \
+    && touch /var/log/kerberos/kadmind.log
+
+# Define Kerberos settings
+#
+KRB_REALM=EXAMPLE.COM
+KERBEROS_ADMIN=admin/admin
+KERBEROS_ADMIN_PASSWORD=admin
+KERBEROS_ROOT_USER_PASSWORD=changeme123
+KEYTAB_DIR=/etc/security/keytabs
+RANGER_ADMIN_SERVER_FQDN=ranger-admin.docker.com
      
+# Create principals and keytabs
+#
+if [ -d ${KEYTAB_DIR} ] && [ -f ${KEYTAB_DIR}/ranger-admin.service.keytab ]; then
+  echo "- File ${KEYTAB_DIR}/ranger-admin.service.keytab exists, skipping create kerberos principals step"
+else 
+  echo "- Creating kerberos principals for ranger services"
+
+  # save cwd and cd to $KEYTAB_DIR
+  pushd ${KEYTAB_DIR}
+
+  kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -randkey -maxrenewlife 7d +allow_renewable HTTP/${RANGER_ADMIN_SERVER_FQDN}@${KRB_REALM}"
+  kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -randkey -maxrenewlife 7d +allow_renewable rangeradmin/${RANGER_ADMIN_SERVER_FQDN}@${KRB_REALM}"
+
+  kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k spnego-ranger.service.keytab HTTP/${RANGER_ADMIN_SERVER_FQDN}"
+  kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k rangeradmin.service.keytab rangeradmin/${RANGER_ADMIN_SERVER_FQDN}"
+
+  chmod 400 spnego-ranger.service.keytab
+  chmod 400 rangeradmin.service.keytab
+
+  # cd back to previously cwd
+  popd
+fi
+
 # Run Ranger Admin setup script
 ./setup.sh
 

@@ -358,12 +358,14 @@ services:
       - db
     tty: true
     volumes:
-      - ./config_files/ranger/admin/bootstrap.sh:/opt/ranger_admin/bootstrap.sh
+      - ./bootstrap/bootstrap-ranger-admin.sh:/opt/ranger_admin/bootstrap.sh
       - ./config_files/ranger/admin/install.properties:/opt/ranger_admin/install.properties
       - ./config_files/ranger/admin/ranger-admin-site.xml:/opt/ranger_admin/ews/webapp/WEB-INF/classes/conf/ranger-admin-site.xml
       - ./config_files/ranger/admin/ranger-admin-default-site.xml:/opt/ranger_admin/ews/webapp/WEB-INF/classes/conf/ranger-admin-default-site.xml
       - ./config_files/ranger/admin/security-applicationContext.xml:/opt/ranger_admin/ews/webapp/WEB-INF/classes/conf/security-applicationContext.xml
+      - ./config_files/kdc/krb5.conf:/etc/krb5.conf
       - keystore:/etc/ssl/certs
+      - keytabs:/etc/security/keytabs
     command: ["./bootstrap.sh"]
     ports:
       - "6182:6182"
