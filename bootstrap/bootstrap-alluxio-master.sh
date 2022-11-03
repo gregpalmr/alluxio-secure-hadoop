@@ -174,7 +174,7 @@ else
      echo "- Creating kerberos principals"
      old_pwd=`pwd`; cd $keytab_dir
 
-     kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -randkey alluxio@${KRB_REALM}"
+     kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -pw ${NON_ROOT_PASSWORD} alluxio@${KRB_REALM}"
      kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k alluxio.headless.keytab alluxio@${KRB_REALM}"
 
      # Create kerberos principal for "northbound" kerberization
