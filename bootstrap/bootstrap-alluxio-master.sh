@@ -206,6 +206,14 @@ cp /tmp/config_files/alluxio/alluxio-env.sh $ALLUXIO_HOME/conf/alluxio-env.sh
 #
 cp /tmp/config_files/alluxio/metrics.properties $ALLUXIO_HOME/conf/metrics.properties
 
+#
+# Configure the alluxio ranger integration
+#
+cp /tmp/config_files/alluxio/ranger-hdfs-audit.xml $ALLUXIO_HOME/conf/
+cp /tmp/config_files/alluxio/ranger-hdfs-policymgr-ssl.xml $ALLUXIO_HOME/conf/
+cp /tmp/config_files/alluxio/ranger-hdfs-security.xml $ALLUXIO_HOME/conf/
+cp /tmp/config_files/alluxio/ranger-security.xml $ALLUXIO_HOME/conf/
+
 # Turn on Alluxio Debug mode (un-comment these if you want to debug ssl or kerberos)
 #echo "export ALLUXIO_JAVA_OPTS=\"$ALLUXIO_JAVA_OPTS -Djavax.net.debug=ssl\"" >> $ALLUXIO_HOME/conf/alluxio-env.sh
 #echo "export ALLUXIO_JAVA_OPTS=\"$ALLUXIO_JAVA_OPTS -Dsun.security.krb5.debug=true\"" >> $ALLUXIO_HOME/conf/alluxio-env.sh
