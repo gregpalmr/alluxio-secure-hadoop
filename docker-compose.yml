@@ -366,6 +366,7 @@ services:
       - ./config_files/ranger/admin/ranger-admin-site.xml:/opt/ranger_admin/ews/webapp/WEB-INF/classes/conf/ranger-admin-site.xml
       - ./config_files/ranger/admin/ranger-admin-default-site.xml:/opt/ranger_admin/ews/webapp/WEB-INF/classes/conf/ranger-admin-default-site.xml
       - ./config_files/ranger/admin/security-applicationContext.xml:/opt/ranger_admin/ews/webapp/WEB-INF/classes/conf/security-applicationContext.xml
+      - ./config_files/ranger/admin/core-site.xml:/opt/ranger_admin/conf/core-site.xml
       - ./config_files/kdc/krb5.conf:/etc/krb5.conf
       - keystore:/etc/ssl/certs
       - keytabs:/etc/security/keytabs
