@@ -324,6 +324,50 @@ services:
       - "keytabs:/etc/security/keytabs"
     entrypoint: ["/bootstrap.sh"]
 
+  # TODO: use single mysql container for multiple databases
+  db:
+    image: mysql:5.7
+    container_name: ranger-db
+    hostname: db
+    domainname: docker.com
+    networks:
+      custom:
+        ipv4_address: 172.23.0.15
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ranger
+      MYSQL_USER: ranger
+      MYSQL_PASSWORD: ranger
+    expose:
+      - "3306"
+
+  ranger-admin:
+    image: kadensungbincho/ranger-admin:2.1.0
+    container_name: ranger-admin
+    hostname: ranger
+    domainname: docker.com
+    networks:
+      custom:
+        ipv4_address: 172.23.0.16
+    environment:
+      JAVA_OPTS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/ranger/ranger-admin-truststore.jks -Djavax.net.ssl.trustStorePassword=changeme123
+    depends_on:
+      - db
+    tty: true
+    volumes:
+      - ./config_files/ranger/admin/bootstrap.sh:/opt/ranger_admin/bootstrap.sh
+      - ./config_files/ranger/admin/install.properties:/opt/ranger_admin/install.properties
+      - ./config_files/ranger/admin/ranger-admin-site.xml:/opt/ranger_admin/ews/webapp/WEB-INF/classes/conf/ranger-admin-site.xml
+      - ./config_files/ranger/admin/ranger-admin-default-site.xml:/opt/ranger_admin/ews/webapp/WEB-INF/classes/conf/ranger-admin-default-site.xml
+      - ./config_files/ranger/admin/security-applicationContext.xml:/opt/ranger_admin/ews/webapp/WEB-INF/classes/conf/security-applicationContext.xml
+      - keystore:/etc/ssl/certs
+    command: ["./bootstrap.sh"]
+    ports:
+      - "6182:6182"
+    restart: always
 
 volumes:
   kdc_storage:
@@ -337,4 +381,6 @@ volumes:
   mysql_data:
     driver: local
   prometheus_data:
+    driver: local
+  db_data:
     driver: local
