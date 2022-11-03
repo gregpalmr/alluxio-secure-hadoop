@@ -352,6 +352,8 @@ services:
     networks:
       custom:
         ipv4_address: 172.22.0.16
+    extra_hosts:
+      - "kdc.kerberos.com kdc:172.22.0.2"
     environment:
       JAVA_OPTS: -Djavax.net.ssl.trustStore=/etc/ssl/certs/ranger/ranger-admin-truststore.jks -Djavax.net.ssl.trustStorePassword=changeme123
     depends_on:
