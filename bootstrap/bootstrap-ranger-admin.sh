@@ -118,5 +118,10 @@ chown ranger:ranger ${KEYTAB_DIR}/rangeradmin.service.keytab
 # Start the Ranger Admin server
 ranger-admin start
 
+# Enable debug log for ranger and hadoop
+# Find useful logs in ${RANGER_ADMIN_HOME}/ews/logs/*.log.
+echo "log4j.logger.org.apache.ranger=debug,xa_log_appender" >> ${RANGER_ADMIN_HOME}/ews/webapp/WEB-INF/log4j.properties
+echo "log4j.logger.org.apache.hadoop=debug,xa_log_appender" >> ${RANGER_ADMIN_HOME}/ews/webapp/WEB-INF/log4j.properties
+
 tail -f logfile 
 
