@@ -99,8 +99,9 @@ fi
 # Run Ranger Admin setup script
 ./setup.sh
 
-chown ranger:ranger spnego-ranger.service.keytab
-chown ranger:ranger rangeradmin.service.keytab
+# change keytab owners to ranger, which is created by setup.sh
+chown ranger:ranger ${KEYTAB_DIR}/spnego-ranger.service.keytab
+chown ranger:ranger ${KEYTAB_DIR}/rangeradmin.service.keytab
 
 # Start the Ranger Admin server
 ranger-admin start
