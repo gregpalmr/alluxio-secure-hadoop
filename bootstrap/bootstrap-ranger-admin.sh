@@ -50,6 +50,8 @@ if [ ! -f /etc/ssl/certs/ranger/rangeradmin.jceks ]; then
     # alluxio-plugin.jceks is used by ranger-plugin which downloads the policy.
     # In our case, the ranger-plugin sits in alluxio master process, and alluxio-plugin.jceks is
     # configured in ${ALLUXIO_HOME}/conf/ranger-hdfs-policymgr-ssl.xml
+    # MAKE SURE the mode of alluxio-plugin.jceks is 400 and the user that starts alluxio master
+    # process is the owner of alluxio-plugin.jceks.
     java -cp "/opt/ranger_admin/cred/lib/*" \
        org.apache.ranger.credentialapi.buildks create sslKeyStore -value 'changeme123' \
        -provider jceks://file/etc/ssl/certs/ranger/alluxio-plugin.jceks
@@ -88,13 +90,18 @@ else
   # save cwd and cd to $KEYTAB_DIR
   pushd ${KEYTAB_DIR}
 
+  # following principals are configured in ${RANGER_HOME}/install.properties
+
+  # HTTP/_HOST@REALM is used for SPNEGO: alluxio ranger-plugin's principle acts as a client, and HTTP/_HOST@REALM acts as a server;
+  # HTTP/_HOST@REALM authenticates client principle in KDC, and on success, it sends cookie back to client as a authentication verification.
+  # This principal is configured in install.properties: "spnego_principal=..." & "spnego_keytab=..."
   kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -randkey -maxrenewlife 7d +allow_renewable HTTP/${RANGER_ADMIN_SERVER_FQDN}@${KRB_REALM}"
-  kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -randkey -maxrenewlife 7d +allow_renewable rangeradmin/${RANGER_ADMIN_SERVER_FQDN}@${KRB_REALM}"
-
   kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k spnego-ranger.service.keytab HTTP/${RANGER_ADMIN_SERVER_FQDN}"
-  kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k rangeradmin.service.keytab rangeradmin/${RANGER_ADMIN_SERVER_FQDN}"
-
   chmod 400 spnego-ranger.service.keytab
+
+  # rangeradmin/_HOST@REALM is used as the ranger-admin service principal. This principal is configured in install.properties: "admin_principal=..." & "admin_keytab=..."
+  kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -randkey -maxrenewlife 7d +allow_renewable rangeradmin/${RANGER_ADMIN_SERVER_FQDN}@${KRB_REALM}"
+  kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k rangeradmin.service.keytab rangeradmin/${RANGER_ADMIN_SERVER_FQDN}"
   chmod 400 rangeradmin.service.keytab
 
   # cd back to previously cwd
