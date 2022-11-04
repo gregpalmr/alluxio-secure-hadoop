@@ -89,6 +89,9 @@ else
   kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k spnego-ranger.service.keytab HTTP/${RANGER_ADMIN_SERVER_FQDN}"
   kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k rangeradmin.service.keytab rangeradmin/${RANGER_ADMIN_SERVER_FQDN}"
 
+  chown ranger:ranger spnego-ranger.service.keytab
+  chown ranger:ranger rangeradmin.service.keytab
+
   chmod 400 spnego-ranger.service.keytab
   chmod 400 rangeradmin.service.keytab
 

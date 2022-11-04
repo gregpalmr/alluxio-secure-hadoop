@@ -34,7 +34,7 @@
 
 	<property>
 		<name>ranger.plugin.hdfs.policy.rest.url</name>
-		<value>https://ranger-admin:6182</value>
+		<value>https://ranger-admin.docker.com:6182</value>
 		<description>
 			URL to Ranger Admin
 		</description>

@@ -153,6 +153,7 @@ services:
       - "hadoop-namenode.docker.com hadoop-namenode: 172.22.0.4"
       - "hadoop-datanode1.docker.com hadoop-datanode1: 172.22.0.5"
       - "alluxio-worker1.docker.com alluxio-worker1: 172.22.0.7"
+      - "ranger-admin.docker.com ranger-admin: 172.22.0.16"
     environment:
       KRB_REALM: EXAMPLE.COM
       DOMAIN_REALM: kdc.kerberos.com
@@ -196,6 +197,7 @@ services:
       - "hadoop-namenode.docker.com hadoop-namenode: 172.22.0.4"
       - "hadoop-datanode1.docker.com hadoop-datanode1: 172.22.0.5"
       - "alluxio-master.docker.com alluxio-master: 172.22.0.6"
+      - "ranger-admin.docker.com ranger-admin: 172.22.0.16"
     environment:
       KRB_REALM: EXAMPLE.COM
       DOMAIN_REALM: kdc.kerberos.com
