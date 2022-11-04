@@ -37,6 +37,7 @@ if [ ! -f /etc/ssl/certs/ranger/rangeradmin.jceks ]; then
              -keystore /etc/ssl/certs/ranger/ranger-plugin-truststore.jks -storepass 'changeme123'
      
      # Credentials file creation - one file containing credentials for both key and truststore
+     # TODO: verify that rangeradmin.jceks is NOT actually used
      java -cp "/opt/ranger_admin/cred/lib/*" \
        org.apache.ranger.credentialapi.buildks create sslKeyStore -value 'changeme123' \
        -provider jceks://file/etc/ssl/certs/ranger/rangeradmin.jceks
@@ -45,6 +46,10 @@ if [ ! -f /etc/ssl/certs/ranger/rangeradmin.jceks ]; then
        org.apache.ranger.credentialapi.buildks create sslTrustStore -value 'changeme123' \
        -provider jceks://file/etc/ssl/certs/ranger/rangeradmin.jceks
 
+    # Credentials file creation - one file containing credentials for both key and truststore
+    # alluxio-plugin.jceks is used by ranger-plugin which downloads the policy.
+    # In our case, the ranger-plugin sits in alluxio master process, and alluxio-plugin.jceks is
+    # configured in ${ALLUXIO_HOME}/conf/ranger-hdfs-policymgr-ssl.xml
     java -cp "/opt/ranger_admin/cred/lib/*" \
        org.apache.ranger.credentialapi.buildks create sslKeyStore -value 'changeme123' \
        -provider jceks://file/etc/ssl/certs/ranger/alluxio-plugin.jceks
