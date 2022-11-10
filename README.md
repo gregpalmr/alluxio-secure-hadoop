@@ -505,6 +505,10 @@ If the Dashboard already exists, then you do not have to manually import it. Ins
 
 Click on the "Alluxio Prometheus Grafana Monitor" link to display the pre-defined general Alluxio Grafana dashboard. It will show live Alluxio metrics based on the pre-installed alluxio_prometheus data source.
 
+For a description of the available Alluxio metrics, see:
+
+     https://docs.alluxio.io/ee/user/stable/en/reference/Metrics-List.html
+
 ---
 
 KNOWN ISSUES:
