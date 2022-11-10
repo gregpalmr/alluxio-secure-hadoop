@@ -486,7 +486,24 @@ The Grafana  web console is available on port number 3000. So you can use the fo
 
      http://localhost:3000
 
+Sign in with the default username and password: admin/admin
+
 #### Step 2. TBD
+
+An Alluxio/Prometheus data source is already defined, but you need to import the standard Alluxio Grafana Dashboard located at:
+
+     https://grafana.com/grafana/dashboards/13467-alluxio-prometheus-grafana-monitor/
+
+On the Grafana console, display the "Import" dashboard menu option by hovering over the plus (+) sign icon on the left margin of the page. In the "Import via Grafana.com" text box, enter the dashboard ID number:
+
+     13467
+
+If the Dashboard already exists, then you do not have to manually import it. Instead, click on the "Search" icon (magnifying glass) and click on the "Alluxio" link.  This will show two existing dashboards:
+
+     Alluxio Prometheus Grafana Monitor
+     Alluxio Master File Ops Dashboard
+
+Click on the "Alluxio Prometheus Grafana Monitor" link to display the pre-defined general Alluxio Grafana dashboard. It will show live Alluxio metrics based on the pre-installed alluxio_prometheus data source.
 
 ---
 
