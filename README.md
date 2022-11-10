@@ -488,7 +488,7 @@ The Grafana  web console is available on port number 3000. So you can use the fo
 
 Sign in with the default username and password: admin/admin
 
-#### Step 2. TBD
+#### Step 2. Access the Alluxio Grafana Dashboard
 
 An Alluxio/Prometheus data source is already defined, but you need to import the standard Alluxio Grafana Dashboard located at:
 
