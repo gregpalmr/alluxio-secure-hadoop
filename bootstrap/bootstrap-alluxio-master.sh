@@ -108,7 +108,7 @@ else
      chmod 400 alluxio-tls-${THIS_FQDN}-truststore.jks
      chmod 400 alluxio-tls-${THIS_FQDN}.cert
      chmod 400 alluxio-tls-client-truststore.jks
-     chwon alluxio alluxio-tls-*
+     chown alluxio alluxio-tls-*
 
      # List the contents of the trustore file
      #echo "- Contents of truststore file: $keys_dir/alluxio-tls-client-truststore.jks"
