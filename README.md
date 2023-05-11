@@ -1,5 +1,5 @@
 # alluxio-secure-hadoop
-Test Alluxio Enterprise with Apache Hadoop 2.10.1 in secure mode
+Test Alluxio Enterprise Edition with Apache Hadoop 2.10.1 in secure mode (TLS and Kerberos)
 
 This repo contains docker compose artifacts that build and launch a small Alluxio cluster that runs against a secure Hadoop environment with Kerberos enabled and SSL connections enforced. It also deploys an example of using secure client access methods including:
 - Alluxio command line interface (CLI)
@@ -83,9 +83,9 @@ Install the docker-compose package
 
      cd alluxio-secure-hadoop
 
-#### Step 3. Copy your Alluxio Enterprise license file
+#### Step 3. Copy your Alluxio Enterprise Edition license file
 
-If you don't already have an Alluxio Enterprise license file, contact your Alluxio salesperson at sales@alluxio.com.  Copy your license file to the alluxio staging directory:
+If you don't already have an Alluxio Enterprise Edition license file, contact your Alluxio salesperson at sales@alluxio.com.  Copy your license file to the alluxio staging directory:
 
      cp ~/Downloads/alluxio-enterprise-license.json config_files/alluxio/
 
