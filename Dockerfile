@@ -182,34 +182,6 @@ RUN export HADOOP_VERNO=2.10.1 \
 #    && chmod 6050 $DOCKER_HADOOP_PREFIX/bin/container-executor \
 #    && rm -rf /tmp/hadoop-${HADOOP_VERNO}-src && rm rm -rf ~/.m2
 
-# Install Apache Drill
-#
-ARG DOCKER_DRILL_HOME=/opt/drill
-RUN DRILL_HOME=$DOCKER_DRILL_HOME \
-    && echo " -------------- Using DRILL_HOME=$DOCKER_DRILL_HOME" \
-    && useradd -d $DOCKER_DRILL_HOME --no-create-home --uid 1004 --gid root drill \
-    && export DRILL_CONF_DIR=$DOCKER_DRILL_HOME/conf \
-    && export DRILL_VERNO=1.20.2 \
-    && \
-    if [ ! -f /tmp/local_files/apache-drill-$DRILL_VERNO-hadoop2.tar.gz ]; then \
-         curl -L https://downloads.apache.org/drill/$DRILL_VERNO/apache-drill-$DRILL_VERNO-hadoop2.tar.gz \
-               -o /tmp/local_files/apache-drill-$DRILL_VERNO-hadoop2.tar.gz; \
-    fi \
-    && tar -xzf /tmp/local_files/apache-drill-$DRILL_VERNO-hadoop2.tar.gz -C /opt/ \
-    && rm -f /tmp/local_files/drill-$DRILL_VERNO-hadoop2.tar.gz \
-    && ln -s /opt/apache-drill-$DRILL_VERNO $DOCKER_DRILL_HOME \
-    && chown drill -R $DOCKER_DRILL_HOME/ \
-    && mkdir -p /etc/drill \
-    && ln -s $DOCKER_DRILL_HOME/conf /etc/drill/conf \
-    && mkdir -p /var/log/drill \
-    && chown drill /var/log/drill \
-    && echo "#### Apache Drill Environment ####" >> /etc/profile \
-    && echo "export DRILL_HOME=$DOCKER_DRILL_HOME" >> /etc/profile \
-    && echo "export DRILL_CONF_DIR=$DRILL_CONF_DIR" >> /etc/profile \
-    && echo "export PATH=\$PATH:\$DRILL_HOME/bin" >> /etc/profile
-
-ADD config_files/drill/* $DOCKER_DRILL_HOME/conf/
-
 # Setup ssh for root user
 #
 ADD config_files/ssh/ssh_config /root/.ssh/config
