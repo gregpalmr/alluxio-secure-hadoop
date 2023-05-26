@@ -340,12 +340,12 @@ RUN groupadd --gid 1001 user1 \
 ARG DOCKER_ALLUXIO_HOME=/opt/alluxio
 RUN export ALLUXIO_HOME=$DOCKER_ALLUXIO_HOME \
     && \
-    if [ ! -f /tmp/local_files/alluxio-enterprise-trial.tar.gz ]; then \
+    if [ ! -f /tmp/local_files/alluxio-enterprise-*.tar.gz ]; then \
         curl https://downloads.alluxio.io/protected/files/alluxio-enterprise-trial.tar.gz \
              -o /tmp/local_files/alluxio-enterprise-trial.tar.gz; \
     fi \
-    && tar xzvf /tmp/local_files/alluxio-enterprise-trial.tar.gz -C /opt \
-    && rm -f /tmp/local_files/alluxio-enterprise-trial.tar.gz \
+    && tar xzvf /tmp/local_files/alluxio-enterprise-*.tar.gz -C /opt \
+    && rm -f /tmp/local_files/alluxio-enterprise-*.tar.gz \
     && ln -s /opt/alluxio-enterprise-* $ALLUXIO_HOME \
     && ln -s $ALLUXIO_HOME/conf /etc/alluxio \
     && echo "#### Alluxio Environment ####" >> /etc/profile \
