@@ -270,34 +270,6 @@ services:
     expose:
       - 2181
 
-  drillbit1:
-    image: myalluxio/alluxio-secure-hadoop:hadoop-2.10.1
-    container_name: drillbit1
-    hostname: drillbit1
-    domainname: docker.com
-    networks:
-      custom:
-        ipv4_address: 172.22.0.13
-    expose:
-      - 8047
-    ports:
-      - 8047
-      - 8047:8047
-    depends_on: ["zookeeper1"]
-    environment:
-      - ALLUXIO_HOME=/opt/alluxio
-      - DRILL_HOME=/opt/drill
-      - DRILL_CONF_DIR=/opt/drill/conf
-      - SERVICE_8047_NAME=drillbit
-      - DRILL_HEAP=512M
-      - DRILL_MAX_DIRECT_MEMORY=1G
-      - DRILL_CLUSTER_ID=drill_cluster
-      - DRILL_ZOOKEEPER_QUORUM=zookeeper1:2181
-    volumes:
-      - ./config_files:/tmp/config_files
-      - ./bootstrap/bootstrap-drillbit.sh:/bootstrap.sh
-    entrypoint: ["/bootstrap.sh"]
-
 volumes:
   kdc_storage:
     driver: local
