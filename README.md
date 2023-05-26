@@ -117,6 +117,8 @@ The Dockerfile script is setup to copy tarballs and zip files from the local_fil
      curl -L https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.5.0/apache-maven-3.5.0-bin.tar.gz -O
      curl -L http://repo.mysql.com/yum/mysql-5.7-community/el/7/x86_64/mysql57-community-release-el7-7.noarch.rpm -O
      curl -L https://archive.apache.org/dist/hive/hive-2.3.8/apache-hive-2.3.8-bin.tar.gz -O
+     cp ~/my_dir/alluxio-enterprise-x.x.x-x.x.tar.gz .
+       or 
      curl -L https://downloads.alluxio.io/protected/files/alluxio-enterprise-trial.tar.gz -O
 
      cd ..
