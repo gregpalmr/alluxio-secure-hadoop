@@ -241,7 +241,7 @@ services:
     command: --web.enable-lifecycle --log.level=debug --config.file=/etc/prometheus/prometheus.yaml
 
   grafana:
-    image: grafana/grafana-oss:8.2.0
+    image: grafana/grafana-oss:10.0.4
     networks:
       custom:
         ipv4_address: 172.22.0.9
