@@ -415,7 +415,7 @@ After running the "SELECT * FROM default.customer" Trino query, Alluxio should h
      $ alluxio fs ls -R /tmp/customer
      -rw-r--r--  root root 7602505 PERSISTED 12-22-2023 20:52:00:767 100% /tmp/customer/20231222_205127_00006_f8rsr_e18c7e4a-5aea-487f-9a2d-a37f3afa5ff8
 
-#### Step 2. Verify that Alluxio persisted the data to HDFS
+#### Step 3. Verify that Alluxio persisted the data to HDFS
 
 Open a bash session to the Hadoop Namenode container and run the "hdfs dfs -ls" command to view the new data files in HDFS. Use the following commands:
 
