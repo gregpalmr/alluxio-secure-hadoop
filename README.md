@@ -299,7 +299,7 @@ Launch a bash session in the Trino coordinator container and run a CREATE TABLE 
           CREATE TABLE default.customer
             WITH (
               format = 'ORC',
-              external_location = 'hdfs:///tmp/customer/'
+              external_location = 'alluxio://alluxio-master:19998/tmp/customer/'
             ) 
             AS SELECT * FROM tpch.sf1.customer;
 
