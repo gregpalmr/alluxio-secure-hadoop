@@ -92,7 +92,7 @@ services:
       - "19888:19888"
       - "10002:10002"
       - "8088:8088"
-      - "8080:8080"
+      - "8082:8082"
     command: ["/bootstrap.sh"]
 
   hadoop-datanode1:
@@ -278,15 +278,24 @@ services:
     depends_on:
       - kdc
       - alluxio-master
+    user: root
     networks:
       custom:
         ipv4_address: 172.22.0.11
+    extra_hosts:
+      - "kdc.kerberos.com kdc: 172.22.0.2"
+      - "hadoop-namenode.docker.com hadoop-namenode: 172.22.0.4"
+      - "hadoop-datanode1.docker.com hadoop-datanode1: 172.22.0.5"
+      - "alluxio-master.docker.com alluxio-master: 172.22.0.6"
+      - "alluxio-worker1.docker.com alluxio-worker1: 172.22.0.7"
     ports:
-      - '8082:8082'
+      - '8080:8080'
     environment:
       KRB_REALM: EXAMPLE.COM
       DOMAIN_REALM: kdc.kerberos.com
       THIS_FQDN: trino-coordinator.docker.com
+      HADOOP_NAMENODE_FQDN: hadoop-namenode.docker.com
+      NON_ROOT_PASSWORD: "changeme123"
     volumes:
       - trino-data:/data
       - ./local_files:/tmp/local_files:ro
@@ -298,14 +307,24 @@ services:
       - -c 
       - |
         find /usr/lib/trino -name alluxio*shaded* -exec rm {} \;
-        cp /tmp/local-files/alluxio-enterprise-*-client.jar /usr/lib/trino/lib/
+        cp /tmp/local_files/alluxio-enterprise-*-client.jar /usr/lib/trino/plugin/hive/
+        cp /tmp/local_files/alluxio-enterprise-*-client.jar /usr/lib/trino/plugin/iceberg/
+        cp /tmp/local_files/alluxio-enterprise-*-client.jar /usr/lib/trino/plugin/hudi/
+        cp /tmp/local_files/alluxio-enterprise-*-client.jar /usr/lib/trino/plugin/delta-lake/
         cp -R /tmp/config_files/trino/etc/catalog        /etc/trino/
         cp /tmp/config_files/trino/etc/node.properties   /etc/trino/
         cp /tmp/config_files/trino/etc/core-site.xml     /etc/trino/
         cp /tmp/config_files/trino/etc/config.properties /etc/trino/
         cp /tmp/config_files/trino/etc/jvm.config        /etc/trino/
+        cp -f /tmp/config_files/kdc/krb5.conf /etc/krb5.conf
+        sed -i "s/EXAMPLE.COM/$${KRB_REALM}/g" /etc/krb5.conf
+        sed -i "s/example.com/$${DOMAIN_REALM}/g" /etc/krb5.conf
         sed -i "s/EXAMPLE.COM/$${KRB_REALM}/g" /etc/trino/core-site.xml
+        sed -i "s/KRB_REALM/$${KRB_REALM}/g" /etc/trino/catalog/hive.properties
+        sed -i "s/HADOOP_NAMENODE_FQDN/$${HADOOP_NAMENODE_FQDN}/g" /etc/trino/catalog/hive.properties
         mkdir -p /home/trino && chown trino:trino /home/trino
+        groupadd --gid 1001 user1
+        useradd --create-home --password $${NON_ROOT_PASSWORD} --gid user1 --uid 1001 user1
         /usr/lib/trino/bin/run-trino
 
 volumes:
