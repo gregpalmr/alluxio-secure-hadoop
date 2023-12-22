@@ -1,10 +1,26 @@
 # FILE: alluxio-site.properties file for clients (hiveserver2)
 #
 
+# Alluxio Master node, single master
 alluxio.master.hostname=alluxio-master.docker.com
+
+# Alluxio Master nodes, HA mode (3, 5, 7 masters)
+alluxio.master.rpc.addresses=alluxio-master-1:19998,alluxio-master-2:19998,alluxio-master-3:19998
+
+# Alluxio Kerberos Setup
 alluxio.security.authentication.type=KERBEROS
 alluxio.security.kerberos.client.principal=hive/_HOST@EXAMPLE.COM
 alluxio.security.kerberos.client.keytab.file=/etc/security/keytabs/hive.service.keytab
+
+# Alluxio TLS encryption properties
+alluxio.network.tls.enabled=false
+alluxio.network.tls.keystore.path=/etc/ssl/certs/alluxio-tls-THIS_FQDN-keystore.jks
+alluxio.network.tls.keystore.alias=THIS_FQDN
+alluxio.network.tls.keystore.password=changeme123
+alluxio.network.tls.keystore.key.password=changeme123
+alluxio.network.tls.server.protocols=TLSv1.1,TLSv1.2
+
+# User readtype and writetype (can be overwridden by users)
 alluxio.user.file.writetype.default=CACHE_THROUGH
 alluxio.user.file.readtype.default=CACHE
 

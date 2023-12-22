@@ -68,10 +68,10 @@ services:
       HADOOP_DATANODE1_FQDN: hadoop-datanode1.docker.com
       ALLUXIO_MASTER_FQDN: alluxio-master.docker.com
     volumes:
-      - ./config_files:/tmp/config_files
+      - ./config_files:/tmp/config_files:ro
       - /etc/localtime:/etc/localtime:ro
       - ./bootstrap/bootstrap-hadoop-namenode.sh:/bootstrap.sh
-      - hdfs_storage:/opt/hadoop/data
+      - hdfs_namenode_storage:/opt/hadoop/data
       - keytabs:/etc/security/keytabs
       - keystore:/etc/ssl/certs
     expose:
@@ -86,6 +86,7 @@ services:
      - 8042
      - 8088
      - 7077
+     - 9083
     ports:
       - "50470:50470"
       - "19888:19888"
@@ -120,10 +121,10 @@ services:
       HADOOP_DATANODE1_FQDN: hadoop-datanode1.docker.com
       ALLUXIO_MASTER_FQDN: alluxio-master.docker.com
     volumes:
-      - ./config_files:/tmp/config_files
+      - ./config_files:/tmp/config_files:ro
       - /etc/localtime:/etc/localtime:ro
       - ./bootstrap/bootstrap-hadoop-datanode.sh:/bootstrap.sh
-      - hdfs_storage:/opt/hadoop/data
+      - hdfs_datanode_storage:/opt/hadoop/data
       - keytabs:/etc/security/keytabs
       - keystore:/etc/ssl/certs
     expose:
@@ -160,7 +161,7 @@ services:
       HADOOP_NAMENODE_URL: hadoop-namenode.docker.com:9000
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ./config_files:/tmp/config_files
+      - ./config_files:/tmp/config_files:ro
       - ./bootstrap/bootstrap-alluxio-master.sh:/bootstrap.sh
       - keytabs:/etc/security/keytabs
       - keystore:/etc/ssl/certs
@@ -204,7 +205,7 @@ services:
       HADOOP_NAMENODE_URL: hadoop-namenode.docker.com:9000
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - ./config_files:/tmp/config_files
+      - ./config_files:/tmp/config_files:ro
       - ./bootstrap/bootstrap-alluxio-worker.sh:/bootstrap.sh
       - keytabs:/etc/security/keytabs
       - keystore:/etc/ssl/certs
@@ -253,7 +254,7 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - ./config_files:/tmp/config_files
+      - ./config_files:/tmp/config_files:ro
       - ./bootstrap/bootstrap-grafana.sh:/bootstrap.sh
     user: root
     entrypoint: ["/bootstrap.sh"]
@@ -270,6 +271,43 @@ services:
     expose:
       - 2181
 
+  trino-coordinator:
+    image: 'trinodb/trino:399'
+    hostname: trino-coordinator
+    container_name: trino-coordinator
+    depends_on:
+      - kdc
+      - alluxio-master
+    networks:
+      custom:
+        ipv4_address: 172.22.0.11
+    ports:
+      - '8082:8082'
+    environment:
+      KRB_REALM: EXAMPLE.COM
+      DOMAIN_REALM: kdc.kerberos.com
+      THIS_FQDN: trino-coordinator.docker.com
+    volumes:
+      - trino-data:/data
+      - ./local_files:/tmp/local_files:ro
+      - ./config_files:/tmp/config_files:ro
+      - keytabs:/etc/security/keytabs
+      - keystore:/etc/ssl/certs
+    command:
+      - /bin/bash
+      - -c 
+      - |
+        find /usr/lib/trino -name alluxio*shaded* -exec rm {} \;
+        cp /tmp/local-files/alluxio-enterprise-*-client.jar /usr/lib/trino/lib/
+        cp -R /tmp/config_files/trino/etc/catalog        /etc/trino/
+        cp /tmp/config_files/trino/etc/node.properties   /etc/trino/
+        cp /tmp/config_files/trino/etc/core-site.xml     /etc/trino/
+        cp /tmp/config_files/trino/etc/config.properties /etc/trino/
+        cp /tmp/config_files/trino/etc/jvm.config        /etc/trino/
+        sed -i "s/EXAMPLE.COM/$${KRB_REALM}/g" /etc/trino/core-site.xml
+        mkdir -p /home/trino && chown trino:trino /home/trino
+        /usr/lib/trino/bin/run-trino
+
 volumes:
   kdc_storage:
     driver: local
@@ -277,9 +315,13 @@ volumes:
     driver: local
   keystore:
     driver: local
-  hdfs_storage:
+  hdfs_namenode_storage:
+    driver: local
+  hdfs_datanode_storage:
     driver: local
   mysql_data:
     driver: local
   prometheus_data:
+    driver: local
+  trino-data:
     driver: local

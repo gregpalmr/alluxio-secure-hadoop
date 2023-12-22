@@ -177,6 +177,7 @@ else
   kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k rm.service.keytab rm/${HADOOP_NAMENODE_FQDN}"
   kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k nm.service.keytab nm/${HADOOP_DATANODE1_FQDN}"
   kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k hive.service.keytab hive/${HADOOP_NAMENODE_FQDN}"
+  kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k trino.service.keytab trino/${HADOOP_NAMENODE_FQDN}"
 
   chmod 400 ${KEYTAB_DIR}/nn.service.keytab
   chmod 400 ${KEYTAB_DIR}/dn.service.keytab
@@ -187,6 +188,7 @@ else
   chmod 400 ${KEYTAB_DIR}/nm.service.keytab
   chown hive:root ${KEYTAB_DIR}/hive.service.keytab
   chmod 400 ${KEYTAB_DIR}/hive.service.keytab
+  chmod 400 ${KEYTAB_DIR}/trino.service.keytab
 
   cd $old_dir
 fi

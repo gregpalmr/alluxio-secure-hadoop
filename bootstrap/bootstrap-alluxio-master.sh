@@ -170,6 +170,7 @@ else
      echo "- Creating kerberos principals"
      old_pwd=`pwd`; cd $keytab_dir
 
+     # Create kerberos principal for "southbound" HDFS kerberization
      kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -randkey alluxio@${KRB_REALM}"
      kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k alluxio.headless.keytab alluxio@${KRB_REALM}"
 
@@ -180,10 +181,18 @@ else
      # Create a kerberos principal for the test Alluxio user
      kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -pw ${NON_ROOT_PASSWORD} user1@${KRB_REALM}"
 
+     # Create kerberos principal for Trino servers to connect to Alluxio masters
+     kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "addprinc -randkey trino@${KRB_REALM}"
+     kadmin -p ${KERBEROS_ADMIN} -w ${KERBEROS_ADMIN_PASSWORD} -q "xst -k trino.headless.keytab trino@${KRB_REALM}"
+
      chown alluxio:root alluxio.headless.keytab
      chown alluxio:root alluxio.${THIS_FQDN}.keytab
      chmod 400          alluxio.headless.keytab
      chmod 400          alluxio.${THIS_FQDN}.keytab
+
+     # Chown to the default Trino user (1000)
+     chown 1000         trino.headless.keytab
+     chmod 400          trino.headless.keytab
 
      cd $old_pwd
 fi
@@ -219,6 +228,8 @@ su - alluxio bash -c "kinit -kt ${KEYTAB_DIR}/alluxio.${THIS_FQDN}.keytab alluxi
 # Format the master node journal
 echo "- Formatting Alluxio journal"
 su - alluxio bash -c "$ALLUXIO_HOME/bin/alluxio formatJournal"
+
+sleep 5
 
 # Start the Alluxio master node daemons
 echo "- Starting Alluxio master daemons (master, job_master)"
