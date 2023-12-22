@@ -398,6 +398,8 @@ Launch a bash session in the Trino coordinator container and run a CREATE TABLE 
                WHERE acctbal > 3500.00 AND acctbal < 9000.00
                ORDER BY acctbal LIMIT 25;
 
+#### Step 2. Verify that the data was written to Alluxio Cache
+
 Verify that the Trino job created the new "customer" data set using Alluxio. Open a bash session in the Alluxio master container and run the "alluxio fs ls" commands like this:
 
      docker exec -it alluxio-master bash
@@ -408,10 +410,28 @@ Verify that the Trino job created the new "customer" data set using Alluxio. Ope
 
      alluxio fs ls -R /tmp/customer
 
-After running the SELECT * FROM default.customer ... Trino query, Alluxio should have cached the results and you can verify that by seeing the "100%" column in the output of the "alluxio fs ls" command, as shown below:
+After running the "SELECT * FROM default.customer" Trino query, Alluxio should have cached the results and persisted the data files in the HDFS under store. You can verify that the files with the "PRESISTED" indicator and verify that the data was cached with the "100%" indicator in the output of the "alluxio fs ls" command, as shown below:
 
      $ alluxio fs ls -R /tmp/customer
      -rw-r--r--  root root 7602505 PERSISTED 12-22-2023 20:52:00:767 100% /tmp/customer/20231222_205127_00006_f8rsr_e18c7e4a-5aea-487f-9a2d-a37f3afa5ff8
+
+#### Step 2. Verify that Alluxio persisted the data to HDFS
+
+Open a bash session to the Hadoop Namenode container and run the "hdfs dfs -ls" command to view the new data files in HDFS. Use the following commands:
+
+     docker exec -it hadoop-namenode bash
+
+     sudo su - user1
+
+     echo changeme123 | kinit
+
+     hdfs dfs -ls /tmp/customer
+
+The results of the "hdfs dfs -ls" command show the data files created by Alluxio:
+
+     $ hdfs dfs -ls /tmp/customer
+     Found 1 items
+     -rw-r--r--   1    7602505 2023-12-22 20:52 /tmp/customer/20231222_205127_00006_f8rsr_e18c7e4a-5aea-487f-9a2d-a37f3afa5ff8
 
 <a name="use_yarn"/></a>
 ### &#x1F536; Use MapReduce2/YARN with the Alluxio virtual filesystem
