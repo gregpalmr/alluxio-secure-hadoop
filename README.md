@@ -276,7 +276,98 @@ And has the following Alluxio properties setup in the /opt/alluxio/conf/alluxio-
 
      hdfs dfs -ls /user/user1/
 
+<a name="use_hive"/></a>
+### &#x1F536; Use Hive with the Alluxio virtual filesystem
 
+#### Step 1. Setup a test data file in Alluxio and HDFS
+
+As a test user, create a small test data file
+
+     docker exec -it alluxio-master bash
+
+     su - user1
+
+     kinit
+     < enter the user's kerberos password: it defaults to "changeme123" >
+
+     echo "1,Jane Doe,jdoe@email.com,555-1234"               > alluxio_table.csv
+     echo "2,Frank Sinclair,fsinclair@email.com,555-4321"   >> alluxio_table.csv
+     echo "3,Iris Culpepper,icullpepper@email.com,555-3354" >> alluxio_table.csv
+
+Create a directory in HDFS and upload the data file
+
+     alluxio fs mkdir /user/user1/alluxio_table/
+
+     alluxio fs copyFromLocal alluxio_table.csv /user/user1/alluxio_table/
+
+     alluxio fs cat /user/user1/alluxio_table/alluxio_table.csv
+
+#### Step 2. Test Hive with the Alluxio virtual filesystem
+
+Confirm that the user1 user has a valid kerberos ticket
+
+     klist
+
+Start a hive session using beeline
+
+     beeline -u "jdbc:hive2://hadoop-namenode.docker.com:10000/default;principal=hive/_HOST@EXAMPLE.COM"
+
+Create a table in Hive that points to the HDFS location
+
+     CREATE DATABASE alluxio_test_db;
+
+     USE alluxio_test_db;
+
+     CREATE EXTERNAL TABLE alluxio_table1 (
+          customer_id BIGINT,
+          name STRING,
+          email STRING,
+          phone STRING )
+     ROW FORMAT DELIMITED
+     FIELDS TERMINATED BY ','
+     LOCATION 'hdfs://hadoop-namenode.docker.com:9000/user/user1/alluxio_table';
+
+     SELECT * FROM alluxio_table1;
+
+Create a table in Hive that points to the Alluxio virtual filesystem
+
+     USE alluxio_test_db;
+
+     CREATE EXTERNAL TABLE alluxio_table2 (
+          customer_id BIGINT,
+          name STRING,
+          email STRING,
+          phone STRING )
+     ROW FORMAT DELIMITED
+     FIELDS TERMINATED BY ','
+     LOCATION 'alluxio://alluxio-master.docker.com:19998/user/user1/alluxio_table';
+
+     SELECT * FROM alluxio_table2;
+
+     SELECT * FROM alluxio_table2 WHERE NAME LIKE '%Frank%';
+
+If you have any issues, you can inspect the Hiveserver2 log file using the commands:
+
+     docker exec -it hadoop-namenode bash
+
+     vi /tmp/hive/hive.log
+
+     vi /opt/hive/hiveserver2-nohup.out
+
+     vi /opt/hive/metastore-nohup.out
+ 
+The Hiveserver2 and Hive metastore config files are in:
+
+     /etc/hive/conf
+
+The Hiveserver2 Alluxio config files are in:
+
+     /etc/alluxio (soft link to /opt/alluxio/conf)
+
+The Alluxio client jar file is in:
+
+     /opt/alluxio/client    
+     
 <a name="use_trino"/></a>
 ### &#x1F536; Use Trino with the Alluxio virtual filesystem
 
