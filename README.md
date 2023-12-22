@@ -17,8 +17,9 @@ Since Alluxio supports a Prometheus sink for metrics, it also deploys:
 [Start the containers](#start_containers)  
 [Test secure access to Alluxio](#use_alluxio)  
 [Use Hive with Alluxio](#use_hive)  
-[Use MapReduce2/YARN with Alluxio](#use_yarn)  
+[Use Trino with Alluxio](#use_trino)  
 [Use Spark with Alluxio](#use_spark)  
+[Use MapReduce2/YARN with Alluxio](#use_yarn)  
 [Use Prometheus to monitor Alluxio](#use_prometheus)  
 [Use Grafana to monitor Alluxio](#use_grafana)  
 
@@ -279,94 +280,47 @@ And has the following Alluxio properties setup in the /opt/alluxio/conf/alluxio-
 <a name="use_hive"/></a>
 ### &#x1F536; Use Hive with the Alluxio virtual filesystem
 
-#### Step 1. Setup a test data file in Alluxio and HDFS
+#### Step 1. Test Trino using the Alluxio Transparent URI feature
 
-As a test user, create a small test data file
+The Alluxio Transparent URI feature will redirect references to s3,s3a and hdfs URIs to the native Alluxio URI (alluxio://). Therefore Hive table definitions with the "external_location=hdfs://<directory name>/<subdirector name>" will be redirected to Alluxio instead of to native HDFS. All the Alluxio data orchestration and data caching capabilities will be employed.
+
+In this project, Trino has been configured to access the Hive metastore and the Alluxio cluster using Kerberos authentication.
+
+Launch a bash session in the Trino coordinator container and run a CREATE TABLE command to create a table using the "hive" Trino cagtalog setup and the "hdfs" URI. Then query the data. Use these commands:
+
+     docker exec -it trino-coordinator bash
+
+     trino --catalog hive --user user1 --debug
+
+     trino>
+
+          USE default;
+
+          CREATE TABLE default.customer
+            WITH (
+              format = 'ORC',
+              external_location = 'hdfs:///tmp/customer/'
+            ) 
+            AS SELECT * FROM tpch.sf1.customer;
+
+          SELECT * FROM default.customer
+               WHERE acctbal > 3500.00 AND acctbal < 9000.00
+               ORDER BY acctbal LIMIT 25;
+
+Verify that the Trino job created the new "customer" data set using Alluxio. Open a bash session in the Alluxio master container and run the "alluxio fs ls" commands like this:
 
      docker exec -it alluxio-master bash
 
-     su - user1
+     sudo su - alluxio
 
-     kinit
-     < enter the user's kerberos password: it defaults to "changeme123" >
+     klist  # verify that the alluxio user still has a kerberos ticket
 
-     echo "1,Jane Doe,jdoe@email.com,555-1234"               > alluxio_table.csv
-     echo "2,Frank Sinclair,fsinclair@email.com,555-4321"   >> alluxio_table.csv
-     echo "3,Iris Culpepper,icullpepper@email.com,555-3354" >> alluxio_table.csv
+     alluxio fs ls -R /tmp/customer
 
-Create a directory in HDFS and upload the data file
+After running the SELECT * FROM default.customer ... Trino query, Alluxio should have cached the results and you can verify that by seeing the "100%" column in the output of the "alluxio fs ls" command, as shown below:
 
-     alluxio fs mkdir /user/user1/alluxio_table/
-
-     alluxio fs copyFromLocal alluxio_table.csv /user/user1/alluxio_table/
-
-     alluxio fs cat /user/user1/alluxio_table/alluxio_table.csv
-
-#### Step 2. Test Hive with the Alluxio virtual filesystem
-
-Confirm that the user1 user has a valid kerberos ticket
-
-     klist
-
-Start a hive session using beeline
-
-     beeline -u "jdbc:hive2://hadoop-namenode.docker.com:10000/default;principal=hive/_HOST@EXAMPLE.COM"
-
-Create a table in Hive that points to the HDFS location
-
-     CREATE DATABASE alluxio_test_db;
-
-     USE alluxio_test_db;
-
-     CREATE EXTERNAL TABLE alluxio_table1 (
-          customer_id BIGINT,
-          name STRING,
-          email STRING,
-          phone STRING ) 
-     ROW FORMAT DELIMITED
-     FIELDS TERMINATED BY ','
-     LOCATION 'hdfs://hadoop-namenode.docker.com:9000/user/user1/alluxio_table';
-
-     SELECT * FROM alluxio_table1;
-
-Create a table in Hive that points to the Alluxio virtual filesystem 
-
-     USE alluxio_test_db;
-
-     CREATE EXTERNAL TABLE alluxio_table2 (
-          customer_id BIGINT,
-          name STRING,
-          email STRING,
-          phone STRING ) 
-     ROW FORMAT DELIMITED
-     FIELDS TERMINATED BY ','
-     LOCATION 'alluxio://alluxio-master.docker.com:19998/user/user1/alluxio_table';
-
-     SELECT * FROM alluxio_table2;
-
-     SELECT * FROM alluxio_table2 WHERE NAME LIKE '%Frank%';
-
-If you have any issues, you can inspect the Hiveserver2 log file using the commands:
-
-     docker exec -it hadoop-namenode bash
-
-     vi /tmp/hive/hive.log
-
-     vi /opt/hive/hiveserver2-nohup.out
-
-     vi /opt/hive/metastore-nohup.out
-
-The Hiveserver2 and Hive metastore config files are in:
-
-     /etc/hive/conf
-
-The Hiveserver2 Alluxio config files are in:
-
-     /etc/alluxio (soft link to /opt/alluxio/conf)
-
-The Alluxio client jar file is in:
-
-     /opt/alluxio/client
+     $ alluxio fs ls -R /tmp/customer
+     -rw-r--r--  root root 7602505 PERSISTED 12-22-2023 20:52:00:767 100% /tmp/customer/20231222_205127_00006_f8rsr_e18c7e4a-5aea-487f-9a2d-a37f3afa5ff8
 
 <a name="use_yarn"/></a>
 ### &#x1F536; Use MapReduce2/YARN with the Alluxio virtual filesystem
