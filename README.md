@@ -277,8 +277,8 @@ And has the following Alluxio properties setup in the /opt/alluxio/conf/alluxio-
      hdfs dfs -ls /user/user1/
 
 
-<a name="use_hive"/></a>
-### &#x1F536; Use Hive with the Alluxio virtual filesystem
+<a name="use_trino"/></a>
+### &#x1F536; Use Trino with the Alluxio virtual filesystem
 
 #### Step 1. Test Trino using the Alluxio Transparent URI feature
 
