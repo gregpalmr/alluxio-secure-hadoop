@@ -317,6 +317,13 @@ fi
 rm /tmp/mysql_commands.sql
 
 #
+# Setup Spark
+#
+
+# Change the Spark Web UI port from 8080 to 8082, so it doesnt conflict with Trino port
+echo "SPARK_MASTER_WEBUI_PORT=8082" >> /etc/spark/conf/spark-env.sh
+
+#
 # Start the hadoop namenode daemons
 #
 source /etc/profile

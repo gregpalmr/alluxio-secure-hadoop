@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<configuration>
+
+    <!-- Enable the Alluxio Transparent URI feature for s3 and s3a end-points -->
+    <property>
+        <name>fs.s3a.impl</name>
+        <value>alluxio.hadoop.ShimFileSystem</value>
+     </property>
+     <property>
+	  <name>fs.AbstractFileSystem.s3a.impl</name>
+	  <value>alluxio.hadoop.AlluxioShimFileSystem</value>
+     </property>
+
+    <!-- Enable the Alluxio Transparent URI feature for HDFS end-points -->
+	<property>
+  	  <name>fs.hdfs.impl</name>
+  	  <value>alluxio.hadoop.ShimFileSystem</value>
+	</property>
+	<property>
+	  <name>fs.AbstractFileSystem.hdfs.impl</name>
+	  <value>alluxio.hadoop.AlluxioShimFileSystem</value>
+     </property>
+
+     <!-- Don't apply Transparent URI for these files -->
+	<property>
+  	  <name>alluxio.user.shimfs.bypass.prefix.list</name>
+  	  <value></value>
+     </property>
+
+     <!-- Don't auto mount Alluxio mounts -->
+	<property>
+  	  <name>alluxio.master.shimfs.auto.mount.enabled</name>
+  	  <value>true</value>
+	</property>
+
+     <!-- Specify the Alluxio master node -->
+     <!-- If using Alluxio in HA mode, specify alluxio.master.rpc.addresses instead -->
+    	<property>
+  	  <name>alluxio.master.hostname</name>
+  	  <value>alluxio-master</value>
+	</property>
+
+     <!-- Specify the Alluxio HA masters -->
+     <!--
+    	<property>
+  	  <name>alluxio.master.rpc.addresses</name>
+  	  <value>alluxio-master-1:19998,alluxio-master-2:19998,alluxio-master-3:19998</value>
+	</property>
+     -->
+
+     <!-- 
+          Setup Alluxio Kerberos for Trino
+          See: https://docs.alluxio.io/ee-da/user/stable/en/security/Kerberos-Security-Setup.html?q=addprinc#client-configuration
+     -->
+
+    	<property>
+  	  <name>alluxio.security.authentication.type</name>
+  	  <value>KERBEROS</value>
+	</property>
+
+    	<property>
+  	  <name>alluxio.security.authorization.permission.enabled</name>
+  	  <value>true</value>
+	</property>
+
+    	<property>
+  	  <name>alluxio.security.kerberos.client.principal</name>
+  	  <value>trino@EXAMPLE.COM</value>
+	</property>
+
+    	<property>
+  	  <name>alluxio.security.kerberos.client.keytab.file</name>
+  	  <value>/etc/security/keytabs/trino.headless.keytab</value>
+	</property>
+
+     <!-- Tell Alluxio to CACHE data when it is read for the first time -->
+
+    	<property>
+  	  <name>alluxio.user.file.readtype.default</name>
+  	  <value>CACHE</value>
+	</property>
+
+     <!-- Enable client-side (northbound) impersonation in Alluxio -->
+     <property>
+       <name>alluxio.security.login.impersonation.username</name>
+       <value>_HDFS_USER_</value>
+     </property>
+
+</configuration>
