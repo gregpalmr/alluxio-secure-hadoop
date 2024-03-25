@@ -23,10 +23,18 @@ scrape_configs:
     metrics_path: '/metrics/prometheus/'
     static_configs:
     - targets: [ 'alluxio-master.docker.com:19999' ]
+  - job_name: 'alluxio job master'
+    metrics_path: '/metrics/prometheus/'
+    static_configs:
+    - targets: [ 'alluxio-master.docker.com:20002' ]
   - job_name: 'alluxio worker'
     metrics_path: '/metrics/prometheus/'
     static_configs:
     - targets: [ 'alluxio-worker1.docker.com:30000' ]
+  - job_name: 'alluxio job worker'
+    metrics_path: '/metrics/prometheus/'
+    static_configs:
+    - targets: [ 'alluxio-worker1.docker.com:30003' ]  
   #- job_name: 'alluxio standalone fuse'
   #  metrics_path: '/metrics/prometheus/'
   #  static_configs:
