@@ -272,7 +272,7 @@ services:
       - 2181
 
   trino-coordinator:
-    image: 'trinodb/trino:399'
+    image: 'trinodb/trino:431'
     hostname: trino-coordinator
     container_name: trino-coordinator
     depends_on:
